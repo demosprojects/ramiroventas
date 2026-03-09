@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Ramiro Ventas</title>
+    <link rel="icon" href="https://res.cloudinary.com/dnakyanzq/image/upload/v1773017774/ut30op01qzvotfrjlolg.webp">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-brand { font-family: 'Montserrat', sans-serif; }
+        .bg-brand-blue { background-color: #0056b3; }
+        .text-brand-yellow { color: #ffcc00; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .modal-active { overflow: hidden; }
+
+        .spinner { width: 30px; height: 30px; border: 3px solid #f3f4f6; border-top: 3px solid #0056b3; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Toggle Switch Compact */
+        .toggle-input { display: none; }
+        .toggle-label { display: flex; align-items: center; cursor: pointer; gap: 8px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 10px; text-transform: uppercase; }
+        .toggle-track { width: 36px; height: 20px; background: #e2e8f0; border-radius: 999px; position: relative; transition: background 0.25s; flex-shrink: 0; }
+        .toggle-thumb { width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.25s; }
+        .toggle-input:checked + .toggle-track { background: #22c55e; }
+        .toggle-input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
+        .toggle-input.oferta-toggle:checked + .toggle-track { background: #ef4444; }
+
+        .stat-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 8px; border-radius: 999px;
+            font-size: 8px; font-weight: 900; font-style: italic;
+            text-transform: uppercase; font-family: 'Montserrat', sans-serif;
+        }
+
+        #modal-form > div, #modal-delete > div {
+            animation: modalPop 0.2s ease-out both;
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        /* ── Zonas de carga de imagen ── */
+        .upload-zone {
+            position: relative;
+            aspect-ratio: 1/1;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .upload-zone:hover { border-color: #0056b3; background: #eff6ff; }
+        .upload-zone.has-image { border-style: solid; border-color: #0056b3; }
+        .upload-zone.uploading { border-color: #f59e0b; background: #fffbeb; }
+        .upload-zone.error { border-color: #ef4444; background: #fef2f2; }
+
+        .upload-zone input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+        }
+        .upload-zone .preview-img {
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+        }
+        .upload-zone .upload-overlay {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .upload-zone:hover .upload-overlay { opacity: 1; }
+        .upload-zone .badge-num {
+            position: absolute; top: 6px; left: 6px;
+            background: #0056b3; color: white;
+            font-size: 9px; font-weight: 900; font-family: 'Montserrat', sans-serif;
+            padding: 1px 7px; border-radius: 999px;
+        }
+        .upload-zone .badge-check {
+            position: absolute; top: 6px; right: 6px;
+            background: #22c55e; color: white;
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px;
+        }
+        .upload-zone .spinner-mini {
+            width: 20px; height: 20px;
+            border: 2px solid #fcd34d; border-top: 2px solid #f59e0b;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        .upload-zone .remove-btn {
+            position: absolute; bottom: 5px; right: 5px;
+            background: #ef4444; color: white;
+            border: none; border-radius: 6px;
+            width: 22px; height: 22px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; cursor: pointer; z-index: 10;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .upload-zone:hover .remove-btn { opacity: 1; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col md:flex-row">
+
+    <aside class="w-full md:w-[320px] flex-shrink-0 bg-[#0b1221] text-white flex flex-col border-r border-slate-900 z-20 md:min-h-screen">
+        <div class="p-8 text-center flex flex-col items-center">
+            <div class="bg-white p-2 rounded-2xl mb-4 shadow-xl">
+                <img src="logo.jpeg" alt="Logo" class="h-16 w-16 object-contain rounded-lg">
+            </div>
+            <h1 class="text-[13px] font-black uppercase italic tracking-[0.2em] text-slate-400">
+                Panel <span class="text-[#ffcc00]">Ramiro</span>
+            </h1>
+        </div>
+
+        <nav class="flex-grow px-6 space-y-3">
+            <a href="#" class="flex items-center gap-4 p-4 bg-[#005bb5] rounded-2xl font-black italic uppercase text-[11px] tracking-wider transition-all shadow-lg shadow-blue-900/40 border border-blue-400/20">
+                <i class="fa-solid fa-box text-sm"></i> Inventario
+            </a>
+            
+            <a href="index.html" class="flex items-center gap-4 p-4 text-slate-400 hover:text-white hover:bg-slate-800/30 rounded-2xl font-black italic uppercase text-[11px] tracking-wider transition-all">
+                <i class="fa-solid fa-shop text-sm"></i> Ver Tienda
+            </a>
+
+            <button id="btn-logout" class="w-full flex items-center gap-4 p-4 text-[#ff5a5a] hover:bg-red-500/10 rounded-2xl font-black italic uppercase text-[11px] tracking-wider transition-all mt-4 border border-red-900/30">
+                <i class="fa-solid fa-right-from-bracket text-sm"></i> Cerrar Sesión
+            </button>
+        </nav>
+
+        <div class="p-8">
+            <div class="border border-slate-800/60 rounded-2xl py-3 px-4 text-center">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Powered by Hostara</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-grow p-4 md:p-8 lg:p-10">
+
+        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-4">
+            <div>
+                <h2 class="text-2xl font-black italic uppercase tracking-tight">Gestión <span class="text-[#0056b3]">Inventario</span></h2>
+                <p id="stats-text" class="text-[12px] text-slate-400 font-bold mt-0.5">Sincronizando...</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+                <div class="relative flex-grow md:flex-grow-0 md:w-64">
+                    <input type="text" id="admin-buscador" placeholder="Buscar..."
+                        class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 pl-10 focus:border-[#0056b3] outline-none transition-all font-bold text-xs shadow-sm">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                </div>
+                
+                <select id="filtro-stock" class="bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:border-[#0056b3] outline-none font-bold text-xs shadow-sm cursor-pointer">
+                    <option value="todos">Todos los estados</option>
+                    <option value="disponible">Disponibles</option>
+                    <option value="agotado">Sin Stock</option>
+                </select>
+
+                <select id="filtro-categoria" class="bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:border-[#0056b3] outline-none font-bold text-xs shadow-sm cursor-pointer">
+                    <option value="todos">Todas las categorías</option>
+                    <option value="Mobiliario">Mobiliario</option>
+                    <option value="Cocina">Cocina</option>
+                    <option value="Dormitorio">Dormitorio</option>
+                    <option value="Climatización">Climatización</option>
+                    <option value="Deco & Otros">Deco & Otros</option>
+                </select>
+
+                <button onclick="abrirModalCrear()" class="bg-[#0056b3] text-white px-6 py-2.5 rounded-xl font-black italic uppercase tracking-wider shadow-md hover:bg-blue-700 transition-all text-[12px]">
+                    <i class="fa-solid fa-plus mr-1"></i>Nuevo
+                </button>
+            </div>
+        </div>
+
+        <div id="loader" class="flex flex-col items-center justify-center py-24">
+            <div class="spinner mb-4"></div>
+            <p class="font-black italic text-slate-300 uppercase text-[11px] tracking-widest">Cargando base de datos...</p>
+        </div>
+
+        <div id="admin-productos" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 hidden"></div>
+    </main>
+
+    <!-- ═══════════ MODAL CREAR/EDITAR ═══════════ -->
+    <div id="modal-form" class="fixed inset-0 bg-slate-900/60 hidden z-[110] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-xl p-6 max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
+            <div class="flex justify-between items-center mb-5 border-b pb-3">
+                <h2 id="modal-titulo" class="text-lg font-black italic uppercase">Nuevo Producto</h2>
+                <button onclick="cerrarModalAdmin()" class="text-slate-400 hover:text-red-500 text-2xl transition-all">&times;</button>
+            </div>
+            <input type="hidden" id="edit-id">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <!-- Nombre -->
+                <div class="md:col-span-2">
+                    <label class="text-[9px] font-black uppercase text-slate-400 mb-1 block tracking-wider">Nombre del Artículo</label>
+                    <input type="text" id="nombre" class="w-full bg-slate-50 p-2.5 rounded-lg border border-slate-200 focus:border-[#0056b3] outline-none font-bold text-sm">
+                </div>
+
+                <!-- Precio -->
+                <div>
+                    <label class="text-[9px] font-black uppercase text-slate-400 mb-1 block tracking-wider">Precio ($)</label>
+                    <input type="number" id="precio" class="w-full bg-slate-50 p-2.5 rounded-lg border border-slate-200 focus:border-[#0056b3] outline-none font-bold text-sm">
+                </div>
+
+                <!-- Categoría -->
+                <div>
+                    <label class="text-[9px] font-black uppercase text-slate-400 mb-1 block tracking-wider">Categoría</label>
+                    <select id="categoria" class="w-full bg-slate-50 p-2.5 rounded-lg border border-slate-200 focus:border-[#0056b3] outline-none font-bold text-sm h-[42px]">
+                        <option value="Mobiliario">Mobiliario</option>
+                        <option value="Cocina">Cocina</option>
+                        <option value="Dormitorio">Dormitorio</option>
+                        <option value="Climatización">Climatización</option>
+                        <option value="Deco & Otros">Deco & Otros</option>
+                    </select>
+                </div>
+
+                <!-- Descripción / Características -->
+                <div class="md:col-span-2">
+                    <label class="text-[9px] font-black uppercase text-slate-400 mb-1 block tracking-wider">Descripción</label>
+                    <textarea id="descripcion" rows="2" class="w-full bg-slate-50 p-2.5 rounded-lg border border-slate-200 focus:border-[#0056b3] outline-none font-bold text-sm resize-none" placeholder="Breve info..."></textarea>
+                    <label class="text-[9px] font-black uppercase text-slate-400 mb-1 mt-2 block tracking-wider">Características Técnicas</label>
+                    <textarea id="caracteristicas" rows="2" class="w-full bg-slate-50 p-2.5 rounded-lg border border-slate-200 focus:border-[#0056b3] outline-none font-bold text-sm resize-none" placeholder="Medidas, materiales..."></textarea>
+                </div>
+
+                <!-- ═══ IMÁGENES ═══ -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider">
+                            Imágenes del producto
+                        </label>
+                        <span class="text-[9px] text-slate-400 font-semibold">
+                            <i class="fa-solid fa-circle-info mr-1"></i>Se convierten a WebP automáticamente
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+
+                        <!-- Zona imagen 1 (Principal) -->
+                        <div class="flex flex-col gap-1">
+                            <div class="upload-zone" id="zone-1" onclick="triggerFileInput(1)">
+                                <input type="file" id="file-input-1" accept="image/*" onchange="handleFileSelect(event, 1)" onclick="event.stopPropagation()">
+                                <span class="badge-num">1</span>
+                                <i class="fa-solid fa-camera text-slate-300 text-xl"></i>
+                                <span class="text-[9px] font-black text-slate-300 uppercase tracking-wide">Principal</span>
+                                <!-- Estado: subiendo -->
+                                <div class="upload-spinner-1 hidden flex-col items-center gap-1">
+                                    <div class="spinner-mini"></div>
+                                    <span class="text-[8px] font-bold text-amber-500 uppercase">Subiendo...</span>
+                                </div>
+                                <!-- Preview -->
+                                <img id="preview-1" class="preview-img hidden" alt="preview">
+                                <div class="upload-overlay">
+                                    <i class="fa-solid fa-camera text-white text-lg"></i>
+                                    <span class="text-[9px] font-bold text-white uppercase">Cambiar</span>
+                                </div>
+                                <div id="check-1" class="badge-check hidden"><i class="fa-solid fa-check"></i></div>
+                                <button type="button" id="remove-1" class="remove-btn hidden" onclick="removeImage(event, 1)">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="img1">
+                        </div>
+
+                        <!-- Zona imagen 2 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="upload-zone" id="zone-2" onclick="triggerFileInput(2)">
+                                <input type="file" id="file-input-2" accept="image/*" onchange="handleFileSelect(event, 2)" onclick="event.stopPropagation()">
+                                <span class="badge-num">2</span>
+                                <i class="fa-solid fa-image text-slate-300 text-xl"></i>
+                                <span class="text-[9px] font-black text-slate-300 uppercase tracking-wide">Extra</span>
+                                <div class="upload-spinner-2 hidden flex-col items-center gap-1">
+                                    <div class="spinner-mini"></div>
+                                    <span class="text-[8px] font-bold text-amber-500 uppercase">Subiendo...</span>
+                                </div>
+                                <img id="preview-2" class="preview-img hidden" alt="preview">
+                                <div class="upload-overlay">
+                                    <i class="fa-solid fa-camera text-white text-lg"></i>
+                                    <span class="text-[9px] font-bold text-white uppercase">Cambiar</span>
+                                </div>
+                                <div id="check-2" class="badge-check hidden"><i class="fa-solid fa-check"></i></div>
+                                <button type="button" id="remove-2" class="remove-btn hidden" onclick="removeImage(event, 2)">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="img2">
+                        </div>
+
+                        <!-- Zona imagen 3 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="upload-zone" id="zone-3" onclick="triggerFileInput(3)">
+                                <input type="file" id="file-input-3" accept="image/*" onchange="handleFileSelect(event, 3)" onclick="event.stopPropagation()">
+                                <span class="badge-num">3</span>
+                                <i class="fa-solid fa-image text-slate-300 text-xl"></i>
+                                <span class="text-[9px] font-black text-slate-300 uppercase tracking-wide">Extra</span>
+                                <div class="upload-spinner-3 hidden flex-col items-center gap-1">
+                                    <div class="spinner-mini"></div>
+                                    <span class="text-[8px] font-bold text-amber-500 uppercase">Subiendo...</span>
+                                </div>
+                                <img id="preview-3" class="preview-img hidden" alt="preview">
+                                <div class="upload-overlay">
+                                    <i class="fa-solid fa-camera text-white text-lg"></i>
+                                    <span class="text-[9px] font-bold text-white uppercase">Cambiar</span>
+                                </div>
+                                <div id="check-3" class="badge-check hidden"><i class="fa-solid fa-check"></i></div>
+                                <button type="button" id="remove-3" class="remove-btn hidden" onclick="removeImage(event, 3)">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="img3">
+                        </div>
+
+                    </div>
+
+                    <!-- Barra de estado de subida -->
+                    <div id="upload-status" class="hidden mt-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-2">
+                        <div class="spinner-mini flex-shrink-0" style="border-color:#fcd34d; border-top-color:#f59e0b;"></div>
+                        <p id="upload-status-text" class="text-[10px] font-bold text-amber-600 uppercase">Subiendo imagen...</p>
+                    </div>
+                </div>
+
+                <!-- Toggles -->
+                <div class="md:col-span-2 bg-slate-50 rounded-xl p-4 space-y-3 border border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <p class="font-bold text-[11px] uppercase italic">Disponible</p>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="disponible" class="toggle-input" checked>
+                            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="font-bold text-[11px] uppercase italic">En Oferta</p>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="enOferta" class="toggle-input oferta-toggle" onchange="togglePrecioAnterior(this)">
+                            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                        </label>
+                    </div>
+                    <div id="campo-precio-anterior" class="hidden pt-2 border-t">
+                        <label class="text-[9px] font-black uppercase text-slate-400 mb-1 block tracking-wider">Precio Anterior ($)</label>
+                        <input type="number" id="precioAnterior" class="w-full bg-white p-2 rounded-lg border border-red-100 focus:border-red-400 outline-none font-bold text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button onclick="cerrarModalAdmin()" class="flex-1 py-3 text-slate-400 font-bold uppercase text-[10px] tracking-wider hover:bg-slate-50 rounded-xl">Cancelar</button>
+                <button onclick="guardarProducto()" id="btn-guardar" class="flex-[2] bg-[#0056b3] text-white py-3 rounded-xl font-black italic uppercase text-[10px] tracking-wider shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-floppy-disk mr-1"></i>Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ MODAL ELIMINAR ═══════════ -->
+    <div id="modal-delete" class="fixed inset-0 bg-slate-900/80 hidden z-[120] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-xs w-full text-center shadow-2xl">
+            <div class="text-red-500 mb-3 text-3xl"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h3 class="text-sm font-black uppercase italic mb-1">¿Eliminar producto?</h3>
+            <p class="text-slate-400 font-bold text-[11px] mb-5">Esta acción no se puede deshacer.</p>
+            <div class="flex gap-2">
+                <button onclick="cerrarModalDelete()" class="flex-1 py-2 font-bold uppercase text-[10px] text-slate-400">No</button>
+                <button id="confirm-delete-btn" class="flex-1 bg-red-600 text-white py-2 rounded-lg font-bold uppercase text-[10px]">Sí, borrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-32 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl z-[200] font-bold italic uppercase text-[10px] transition-all duration-500 flex items-center gap-2 border-b-2 border-yellow-400"></div>
+
+    <script type="module" src="admin.js"></script>
+
+    <script>
+        // ── Toggle precio anterior ──
+        function togglePrecioAnterior(checkbox) {
+            const campo = document.getElementById('campo-precio-anterior');
+            campo.classList.toggle('hidden', !checkbox.checked);
+            if (!checkbox.checked) document.getElementById('precioAnterior').value = '';
+        }
+
+        // ── Cloudinary config ──
+        const CLOUDINARY_URL  = "https://api.cloudinary.com/v1_1/dnakyanzq/image/upload";
+        const UPLOAD_PRESET   = "uploads";
+
+        // Contador de subidas en curso para bloquear el botón guardar
+        let uploadsEnCurso = 0;
+
+        function setUploading(isUploading) {
+            uploadsEnCurso += isUploading ? 1 : -1;
+            if (uploadsEnCurso < 0) uploadsEnCurso = 0;
+            const btn = document.getElementById('btn-guardar');
+            if (btn) btn.disabled = uploadsEnCurso > 0;
+            document.getElementById('upload-status').classList.toggle('hidden', uploadsEnCurso === 0);
+        }
+
+        function triggerFileInput(num) {
+            document.getElementById(`file-input-${num}`).click();
+        }
+
+        function handleFileSelect(event, num) {
+            const file = event.target.files[0];
+            if (!file) return;
+            uploadImage(file, num);
+            // Limpiar el input para permitir volver a seleccionar el mismo archivo
+            event.target.value = "";
+        }
+
+        async function uploadImage(file, num) {
+            const zone    = document.getElementById(`zone-${num}`);
+            const spinner = document.querySelector(`.upload-spinner-${num}`);
+            const preview = document.getElementById(`preview-${num}`);
+            const check   = document.getElementById(`check-${num}`);
+            const removeBtn = document.getElementById(`remove-${num}`);
+            const imgInput  = document.getElementById(`img${num}`);
+            const statusText = document.getElementById('upload-status-text');
+
+            // Mostrar estado de subida
+            zone.classList.add('uploading');
+            zone.classList.remove('has-image', 'error');
+            spinner.classList.remove('hidden');
+            spinner.classList.add('flex');
+            preview.classList.add('hidden');
+            check.classList.add('hidden');
+            removeBtn.classList.add('hidden');
+            statusText.textContent = `Subiendo imagen ${num}...`;
+            setUploading(true);
+
+            try {
+                // Convertir a WebP usando Canvas antes de subir
+                const webpBlob = await convertToWebP(file);
+
+                const formData = new FormData();
+                formData.append("file", webpBlob, `producto_img${num}.webp`);
+                formData.append("upload_preset", UPLOAD_PRESET);
+
+                const res  = await fetch(CLOUDINARY_URL, { method: "POST", body: formData });
+                const data = await res.json();
+
+                if (data.secure_url) {
+                    imgInput.value = data.secure_url;
+                    preview.src = data.secure_url;
+                    preview.classList.remove('hidden');
+                    check.classList.remove('hidden');
+                    removeBtn.classList.remove('hidden');
+                    zone.classList.add('has-image');
+                    zone.classList.remove('uploading', 'error');
+                } else {
+                    throw new Error("Sin URL en respuesta");
+                }
+            } catch (err) {
+                console.error(`Error subiendo imagen ${num}:`, err);
+                zone.classList.add('error');
+                zone.classList.remove('uploading', 'has-image');
+                imgInput.value = "";
+                mostrarToastGlobal(`❌ Error al subir imagen ${num}`);
+            } finally {
+                spinner.classList.add('hidden');
+                spinner.classList.remove('flex');
+                setUploading(false);
+            }
+        }
+
+        // Convierte cualquier imagen a WebP usando Canvas
+        function convertToWebP(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width  = img.width;
+                        canvas.height = img.height;
+                        canvas.getContext('2d').drawImage(img, 0, 0);
+                        canvas.toBlob(
+                            (blob) => blob ? resolve(blob) : reject(new Error('Canvas toBlob falló')),
+                            'image/webp',
+                            0.85
+                        );
+                    };
+                    img.onerror = reject;
+                };
+                reader.onerror = reject;
+            });
+        }
+
+        function removeImage(event, num) {
+            event.stopPropagation();
+            const zone      = document.getElementById(`zone-${num}`);
+            const preview   = document.getElementById(`preview-${num}`);
+            const check     = document.getElementById(`check-${num}`);
+            const removeBtn = document.getElementById(`remove-${num}`);
+            const imgInput  = document.getElementById(`img${num}`);
+
+            imgInput.value = "";
+            preview.src = "";
+            preview.classList.add('hidden');
+            check.classList.add('hidden');
+            removeBtn.classList.add('hidden');
+            zone.classList.remove('has-image', 'uploading', 'error');
+        }
+
+        // Carga una URL existente (al editar un producto) en una zona
+        function loadExistingImage(url, num) {
+            if (!url) return;
+            const zone      = document.getElementById(`zone-${num}`);
+            const preview   = document.getElementById(`preview-${num}`);
+            const check     = document.getElementById(`check-${num}`);
+            const removeBtn = document.getElementById(`remove-${num}`);
+            const imgInput  = document.getElementById(`img${num}`);
+
+            imgInput.value = url;
+            preview.src = url;
+            preview.classList.remove('hidden');
+            check.classList.remove('hidden');
+            removeBtn.classList.remove('hidden');
+            zone.classList.add('has-image');
+            zone.classList.remove('error', 'uploading');
+        }
+
+        // Limpia las 3 zonas (llamado desde limpiarForm en admin.js)
+        function resetImageZones() {
+            [1, 2, 3].forEach(num => removeImage({ stopPropagation: () => {} }, num));
+        }
+
+        // Toast accesible desde este script (antes de que cargue el módulo)
+        function mostrarToastGlobal(msj) {
+            const t = document.getElementById("toast");
+            if (!t) return;
+            t.innerHTML = msj;
+            t.classList.remove("translate-y-32");
+            setTimeout(() => t.classList.add("translate-y-32"), 2800);
+        }
+    </script>
+</body>
+</html>
