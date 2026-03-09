@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMIRO VENTAS | De todo para tu casa</title>
+    <link rel="icon" href="https://res.cloudinary.com/dnakyanzq/image/upload/v1773017774/ut30op01qzvotfrjlolg.webp">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-brand { font-family: 'Montserrat', sans-serif; }
+
+        .product-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(0,86,179,0.13); }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .modal-active { overflow: hidden; height: 100%; }
+
+        .cat-btn.active {
+            background-color: #0056b3 !important;
+            color: white !important;
+            box-shadow: 0 3px 10px rgba(0,86,179,0.3);
+        }
+
+        #toast {
+            transition: transform 0.4s cubic-bezier(.17,.67,.4,1.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-card {
+            animation: modalIn 0.22s cubic-bezier(.17,.67,.4,1.2) both;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.94) translateY(12px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .carrito-panel {
+            animation: slideIn 0.28s cubic-bezier(.25,.46,.45,.94) both;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to   { transform: translateX(0); }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @media (max-width: 639px) {
+            .nav-logo { height: 2.75rem; }
+            .hero-section { height: 52vw; min-height: 220px; max-height: 320px; }
+            .product-card .card-img { aspect-ratio: 1/1; }
+            .product-card .card-body { padding: 0.6rem 0.75rem 0.75rem; }
+            .product-card .card-name { font-size: 0.7rem; margin-bottom: 0.25rem; }
+            .product-card .card-price { font-size: 1rem; }
+            .product-card .card-btn { padding: 0.45rem 0; font-size: 0.65rem; border-radius: 0.6rem; }
+            .carrito-panel { max-width: 100% !important; }
+            .modal-sm { max-width: calc(100vw - 2rem); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <nav class="bg-white sticky top-0 z-[100] shadow-sm border-b-[3px] border-[#0056b3]">
+        <div class="container mx-auto px-3 sm:px-4 py-1.5 sm:py-2 flex justify-between items-center">
+            <a href="#" class="flex items-center flex-shrink-0">
+                <img src="logo.jpeg" alt="Ramiro Ventas" class="nav-logo h-11 sm:h-16 md:h-20 object-contain">
+            </a>
+
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button onclick="abrirCarrito()" class="relative bg-[#0056b3] text-white p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-cart-shopping text-base sm:text-lg"></i>
+                    <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header id="inicio" class="hero-section relative h-[42vh] sm:h-[55vh] md:h-[70vh] flex items-center justify-center text-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                class="w-full h-full object-cover brightness-50" alt="Muebles">
+        </div>
+        <div class="relative z-10 px-4 max-w-3xl mx-auto">
+            <h1 class="text-3xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tighter mb-2 sm:mb-4 italic leading-tight">
+                Equipa tu casa <br><span class="text-[#ffcc00] underline">con lo mejor</span>
+            </h1>
+            <p class="text-white text-xs sm:text-base md:text-2xl font-semibold mb-5 sm:mb-8 opacity-90">Productos de calidad. Enviamos a todo el Chaco.</p>
+            <a href="#productos" class="bg-red-600 hover:bg-red-700 text-white px-7 py-3 sm:px-10 sm:py-4 md:px-12 md:py-5 rounded-full font-black text-sm sm:text-base md:text-xl uppercase tracking-widest shadow-2xl transition-all inline-block">
+                Ver Productos
+            </a>
+        </div>
+    </header>
+
+    <section class="py-3 sm:py-5 bg-white border-b shadow-sm">
+        <div class="container mx-auto px-3 sm:px-4">
+            <div class="flex items-center gap-1.5 sm:gap-3 overflow-x-auto no-scrollbar" id="categorias-container">
+                <button onclick="filtrarCategoria('Todos')" class="cat-btn active px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm bg-[#0056b3] text-white">Todos</button>
+                <button onclick="filtrarCategoria('Mobiliario')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-yellow-400 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Mobiliario</button>
+                <button onclick="filtrarCategoria('Cocina')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-red-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Cocina</button>
+                <button onclick="filtrarCategoria('Dormitorio')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-indigo-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Dormitorio</button>
+                <button onclick="filtrarCategoria('Climatización')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-cyan-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Climatización</button>
+                <button onclick="filtrarCategoria('Deco &amp; Otros')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-green-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Otros</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-6 pb-2">
+        <div class="container mx-auto px-3 sm:px-4">
+            <div class="relative max-w-2xl mx-auto"> <input type="text" id="buscador-principal" placeholder="¿Con qué te vas a equipar?"
+                    class="w-full bg-white border-2 border-gray-200 rounded-2xl py-3.5 px-5 pl-12 focus:border-[#0056b3] outline-none transition-all font-bold text-sm sm:text-base shadow-sm">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+            </div>
+        </div>
+    </section>
+
+    <main id="productos" class="container mx-auto px-3 sm:px-4 py-7 sm:py-10 md:py-12">
+        <div class="flex justify-between items-center mb-5 sm:mb-10 gap-2">
+            <h2 class="text-lg sm:text-2xl md:text-3xl font-black uppercase italic border-l-[6px] border-[#0056b3] pl-3">Productos disponibles</h2>
+        </div>
+
+        <div id="productos-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-8">
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white pt-12 pb-6">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-center border-b border-white/10 pb-8 mb-6">
+            
+            <div class="flex flex-col items-center md:items-start text-center md:text-left">
+                <img src="logo-removido.png" alt="Logo de Ramiro Ventas" class="h-16 md:h-20 object-contain mb-4">
+                <h3 class="text-lg font-black italic text-[#ffcc00] uppercase tracking-tighter">Ramiro Ventas</h3>
+                <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Villa Ángela - Chaco</p>
+            </div>
+
+            <div class="text-center px-4">
+                <p class="text-white/80 font-black italic uppercase text-sm sm:text-base tracking-widest leading-relaxed">
+                    Equipate con <span class="text-[#ffcc00]">lo mejor.</span>
+                </p>
+            </div>
+
+            <div class="flex flex-col items-center md:items-end gap-4 mt-2 md:mt-0">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Seguinos en redes</span>
+                <div class="flex gap-6 text-2xl">
+                    <a href="#" aria-label="Instagram" class="text-white hover:text-[#E1306C] transition-all duration-300 hover:scale-110 hover:-translate-y-1">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" aria-label="WhatsApp" class="text-white hover:text-[#25D366] transition-all duration-300 hover:scale-110 hover:-translate-y-1">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                    <a href="#" aria-label="Facebook" class="text-white hover:text-[#1877F2] transition-all duration-300 hover:scale-110 hover:-translate-y-1">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center md:text-left">
+            <p>© 2026 Ramiro Ventas. Todos los derechos reservados.</p>
+            <p>Diseñado y desarrollado por 
+                <a href="https://hostara.vercel.app" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#ffcc00] transition-all duration-300 border-b border-transparent hover:border-[#ffcc00] pb-0.5 ml-1">
+                    Hostara
+                </a>
+            </p>
+        </div>
+        
+    </div>
+</footer>
+    <div id="modal-detalles" class="fixed inset-0 bg-black/80 hidden z-[110] flex items-end sm:items-center justify-center sm:p-4 backdrop-blur-sm">
+        <div class="modal-card bg-white w-full sm:max-w-4xl rounded-t-3xl sm:rounded-3xl shadow-2xl relative max-h-[92vh] sm:max-h-[95vh] overflow-hidden flex flex-col">
+            <button onclick="cerrarModal('modal-detalles')" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-lg text-gray-400 hover:text-red-500 z-10 transition-colors bg-white rounded-full shadow">&times;</button>
+            <div class="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
+                <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+            </div>
+            <div id="detalle-contenido" class="flex flex-col sm:flex-row overflow-y-auto no-scrollbar flex-1">
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-carrito" class="fixed inset-0 bg-black/40 hidden z-[110] flex justify-end backdrop-blur-sm">
+        <div class="carrito-panel bg-white w-full sm:max-w-sm md:max-w-md h-full shadow-2xl flex flex-col">
+            <div class="flex justify-between items-center px-4 sm:px-5 py-3 sm:py-4 border-b flex-shrink-0">
+                <h2 class="text-base sm:text-xl font-black italic uppercase tracking-tight">Mi carrito</h2>
+                <button onclick="cerrarModal('modal-carrito')" class="w-8 h-8 flex items-center justify-center text-xl text-gray-400 hover:text-black rounded-full hover:bg-gray-100 transition-colors">&times;</button>
+            </div>
+            <div id="carrito-lista" class="flex-1 overflow-y-auto no-scrollbar px-3 sm:px-4 py-3 space-y-2">
+            </div>
+            <div class="border-t px-4 sm:px-5 py-4 bg-white flex-shrink-0">
+                <div class="flex justify-between items-baseline mb-3">
+                    <span class="text-sm font-black uppercase italic text-gray-500">Total</span>
+                    <span id="total-carrito" class="text-xl sm:text-2xl font-black text-[#0056b3]">$0</span>
+                </div>
+                <button onclick="enviarWhatsApp()" class="w-full bg-green-500 text-white py-3.5 rounded-2xl font-black hover:bg-green-600 transition-all flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Enviar pedido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-confirm" class="fixed inset-0 bg-black/60 hidden z-[200] flex items-center justify-center px-4 backdrop-blur-sm">
+        <div class="modal-card modal-sm bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
+            <div class="px-5 pt-5 pb-1 flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i class="fa-solid fa-triangle-exclamation text-red-500 text-base"></i>
+                </div>
+                <div class="flex-grow min-w-0">
+                    <h3 id="confirm-titulo" class="font-black text-base uppercase italic text-gray-900 mb-0.5 leading-tight"></h3>
+                    <p id="confirm-mensaje" class="text-gray-500 text-xs sm:text-sm font-semibold leading-relaxed"></p>
+                </div>
+                <button id="confirm-close" class="text-gray-300 hover:text-gray-500 text-xl leading-none transition-colors flex-shrink-0">&times;</button>
+            </div>
+            <div class="flex gap-2 px-5 pb-5 pt-4">
+                <button id="confirm-cancel" class="flex-1 py-2.5 rounded-xl font-black uppercase text-gray-600 bg-gray-100 hover:bg-gray-200 text-xs transition-all">Cancelar</button>
+                <button id="confirm-ok" class="flex-1 py-2.5 rounded-xl font-black uppercase text-white bg-red-600 hover:bg-red-700 text-xs transition-all"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-alert" class="fixed inset-0 bg-black/60 hidden z-[200] flex items-center justify-center px-4 backdrop-blur-sm">
+        <div class="modal-card modal-sm bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative">
+            <button id="alert-close" class="absolute top-3 right-3 text-gray-300 hover:text-gray-500 text-xl transition-colors">&times;</button>
+            <div class="px-5 pt-7 pb-1 flex flex-col items-center text-center">
+                <div id="alert-icono" class="mb-3 text-4xl"></div>
+                <h3 id="alert-titulo" class="font-black text-base uppercase italic text-gray-900 mb-1"></h3>
+                <p id="alert-mensaje" class="text-gray-500 text-xs sm:text-sm font-semibold leading-relaxed"></p>
+            </div>
+            <div class="px-5 pb-5 pt-4">
+                <button id="alert-ok" class="w-full py-2.5 rounded-xl font-black uppercase text-white bg-[#0056b3] hover:bg-[#004090] text-xs transition-all"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 translate-y-32 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-2xl z-[300] font-bold text-xs sm:text-sm border border-white/10 whitespace-nowrap max-w-[90vw] overflow-hidden text-ellipsis">
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
