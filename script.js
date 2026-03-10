@@ -750,16 +750,17 @@ window.enviarWhatsApp = function() {
         return;
     }
 
-    let msj = "Hola Ramiro! Te escribo desde la web. Quiero consultar por estos productos:%0A%0A";
+    let msj = "Hola Ramiro! Te escribo desde la web. Quiero comprar los siguientes productos:%0A%0A";
     let total = 0;
     carrito.forEach(p => {
         const etiqueta = p.variante ? `${p.nombre} (${p.variante})` : p.nombre;
         msj += `*- ${etiqueta}* (x${p.cantidad}) - $${(p.precio * p.cantidad).toLocaleString('es-AR')}%0A`;
         total += p.precio * p.cantidad;
     });
-    msj += `%0A*TOTAL: $${total.toLocaleString('es-AR')}*%0A%0AEstan disponibles? Muchas gracias!`;
+    msj += `%0A*TOTAL: $${total.toLocaleString('es-AR')}*%0A%0AMuchas gracias!`;
     window.open(`https://wa.me/5493735538773?text=${msj}`);
 };
 
 cargarProductos();
+
 
