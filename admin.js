@@ -43,15 +43,68 @@ async function cargarProductos() {
 }
 
 // ─── LÓGICA DE FILTRADO UNIFICADA ────────────────────────────────────────────
+
+// Mapa de palabras clave de disponibilidad para búsqueda por texto
+const KEYWORDS_DISPONIBLE  = ['disponible', 'stock', 'con stock', 'activo'];
+const KEYWORDS_AGOTADO     = ['agotado', 'sin stock', 'agotada', 'inactivo'];
+
+// Mapa de alias de categorías para búsqueda por texto
+const ALIAS_CATEGORIAS = {
+    'mobiliario': 'Mobiliario',
+    'mueble': 'Mobiliario', 'muebles': 'Mobiliario',
+    'cocina': 'Cocina',
+    'dormitorio': 'Dormitorio', 'cuarto': 'Dormitorio', 'habitacion': 'Dormitorio', 'habitación': 'Dormitorio',
+    'climatizacion': 'Climatización', 'climatización': 'Climatización', 'aire': 'Climatización', 'calefaccion': 'Climatización', 'calefacción': 'Climatización',
+    'electronica': 'Electrónica', 'electrónica': 'Electrónica', 'electronico': 'Electrónica', 'electrónico': 'Electrónica', 'tecnologia': 'Electrónica', 'tecnología': 'Electrónica',
+    'mates': 'Mates', 'mate': 'Mates',
+    'deco': 'Deco & Otros', 'otros': 'Deco & Otros', 'decoracion': 'Deco & Otros', 'decoración': 'Deco & Otros',
+};
+
 function aplicarFiltros() {
-    const texto = document.getElementById('admin-buscador').value.toLowerCase().trim();
-    const stock = document.getElementById('filtro-stock').value;
-    const cat   = document.getElementById('filtro-categoria').value;
+    const textoRaw = document.getElementById('admin-buscador').value.trim();
+    const texto    = textoRaw.toLowerCase();
+    const stock    = document.getElementById('filtro-stock').value;
+    const cat      = document.getElementById('filtro-categoria').value;
+
+    // Detectar si el texto coincide con un keyword de disponibilidad
+    const textoPideDisp    = KEYWORDS_DISPONIBLE.some(k => texto.includes(k));
+    const textoPideAgotado = KEYWORDS_AGOTADO.some(k => texto.includes(k));
+
+    // Detectar si el texto coincide con una categoría
+    const categoriaDetectada = ALIAS_CATEGORIAS[texto] || null;
 
     productosFiltrados = productos.filter(p => {
-        const matchTexto = p.nombre.toLowerCase().includes(texto) || (p.categoria && p.categoria.toLowerCase().includes(texto));
-        const matchStock = stock === 'todos' ? true : (stock === 'disponible' ? p.disponible !== false : p.disponible === false);
-        const matchCat   = cat === 'todos'   ? true : p.categoria === cat;
+        // ── Filtro de texto ──
+        // Si el texto es un keyword de disponibilidad o categoría, no filtrar por nombre
+        const esKeywordEspecial = textoPideDisp || textoPideAgotado || categoriaDetectada;
+        const matchTexto = esKeywordEspecial
+            ? true
+            : (texto === '' || p.nombre.toLowerCase().includes(texto) || (p.categoria && p.categoria.toLowerCase().includes(texto)));
+
+        // ── Filtro de stock (select + texto) ──
+        let matchStock;
+        if (stock !== 'todos') {
+            // El select tiene prioridad
+            matchStock = stock === 'disponible' ? p.disponible !== false : p.disponible === false;
+        } else if (textoPideDisp) {
+            matchStock = p.disponible !== false;
+        } else if (textoPideAgotado) {
+            matchStock = p.disponible === false;
+        } else {
+            matchStock = true;
+        }
+
+        // ── Filtro de categoría (select + texto) ──
+        let matchCat;
+        if (cat !== 'todos') {
+            // El select tiene prioridad
+            matchCat = p.categoria === cat;
+        } else if (categoriaDetectada) {
+            matchCat = p.categoria === categoriaDetectada;
+        } else {
+            matchCat = true;
+        }
+
         return matchTexto && matchStock && matchCat;
     });
 
@@ -149,10 +202,18 @@ window.guardarProducto = async function() {
     const imgs = [
         document.getElementById("img1").value.trim(),
         document.getElementById("img2").value.trim(),
-        document.getElementById("img3").value.trim()
+        document.getElementById("img3").value.trim(),
+        document.getElementById("img4").value.trim(),
+        document.getElementById("img5").value.trim(),
+        document.getElementById("img6").value.trim()
     ].filter(i => i !== "");
 
     if (imgs.length === 0) return mostrarToast("⚠️ Agregá al menos una imagen");
+
+    // Leer variantes desde el array global definido en admin.html
+    const variantesValidas = (typeof variantesData !== 'undefined' ? variantesData : [])
+        .filter(v => v.nombre.trim() !== '' && Number(v.precio) > 0)
+        .map(v => ({ nombre: v.nombre.trim(), precio: Number(v.precio), disponible: v.disponible !== false }));
 
     const datos = {
         nombre,
@@ -165,7 +226,8 @@ window.guardarProducto = async function() {
         enOferta:        document.getElementById("enOferta").checked,
         precioAnterior:  document.getElementById("enOferta").checked
                             ? Number(document.getElementById("precioAnterior").value) || null
-                            : null
+                            : null,
+        variantes:       variantesValidas
     };
 
     toggleLoader(true);
@@ -215,7 +277,7 @@ window.editarProducto = function(id) {
     // loadExistingImage es una función global definida en admin.html
     if (p.imagenes && typeof loadExistingImage === 'function') {
         p.imagenes.forEach((url, i) => {
-            if (url && i < 3) loadExistingImage(url, i + 1);
+            if (url && i < 6) loadExistingImage(url, i + 1);
         });
     }
 
@@ -224,6 +286,11 @@ window.editarProducto = function(id) {
     if (p.enOferta) {
         document.getElementById("campo-precio-anterior").classList.remove("hidden");
         document.getElementById("precioAnterior").value = p.precioAnterior || "";
+    }
+
+    // Cargar variantes existentes
+    if (typeof cargarVariantesExistentes === 'function') {
+        cargarVariantesExistentes(p.variantes || []);
     }
 
     document.getElementById("modal-titulo").innerText = "Editar Producto";
@@ -253,6 +320,9 @@ function limpiarForm() {
     document.getElementById("disponible").checked = true;
     document.getElementById("enOferta").checked   = false;
     document.getElementById("campo-precio-anterior").classList.add("hidden");
+
+    // Limpiar variantes
+    if (typeof resetVariantes === 'function') resetVariantes();
 
     // Limpiar zonas de imagen — función global en admin.html
     if (typeof resetImageZones === 'function') resetImageZones();
