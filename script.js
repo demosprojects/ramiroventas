@@ -723,7 +723,7 @@ function actualizarContador() {
 window.enviarConsultaWhatsApp = function(id) {
     const prod = productos.find(p => p.id === id);
     if (!prod) return;
-    const msj = `Hola Ramiro! Te escribo desde la web. Quería consultar si tienen disponible: *${prod.nombre}*. Muchas gracias!`;
+    const msj = `Hola Ramiro! Te escribo desde la web. Quiero los siguientes productos: *${prod.nombre}*. Muchas gracias!`;
     window.open(`https://wa.me/5493735538773?text=${encodeURIComponent(msj)}`);
 };
 
@@ -762,3 +762,4 @@ window.enviarWhatsApp = function() {
 };
 
 cargarProductos();
+
