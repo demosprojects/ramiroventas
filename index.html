@@ -20,6 +20,171 @@
 
         .modal-active { overflow: hidden; height: 100%; }
 
+        /* ── Modal detalle ── */
+
+        /* Contenedor principal: en mobile es columna, en desktop fila */
+        #detalle-contenido {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;  /* el scroll lo maneja cada hijo */
+            flex: 1;
+            min-height: 0;
+        }
+        @media (min-width: 640px) {
+            #detalle-contenido { flex-direction: row; }
+        }
+
+        /* Columna galería */
+        .detalle-col-galeria {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+        }
+        /* En mobile: ocupa ancho completo, imagen cuadrada */
+        @media (max-width: 639px) {
+            .detalle-col-galeria { width: 100%; }
+        }
+        /* En desktop: ocupa 45% del ancho, altura completa */
+        @media (min-width: 640px) {
+            .detalle-col-galeria { width: 45%; }
+        }
+
+        /* Imagen principal */
+        .detalle-img-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;   /* cuadrada siempre en mobile */
+            overflow: hidden;
+            background: #f1f5f9;
+            flex-shrink: 0;
+            cursor: zoom-in;
+        }
+        @media (min-width: 640px) {
+            .detalle-img-wrap {
+                aspect-ratio: unset;
+                flex: 1;            /* en desktop ocupa el espacio disponible */
+                min-height: 0;
+            }
+        }
+
+        /* Columna info: scroll interno, botón siempre al fondo */
+        .detalle-col-info {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .detalle-col-info::-webkit-scrollbar { display: none; }
+
+        .detalle-info-body {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .detalle-info-body::-webkit-scrollbar { display: none; }
+        @media (min-width: 640px) {
+            .detalle-info-body { padding: 1.75rem 2rem; }
+        }
+
+        /* Botón pegado al fondo */
+        .detalle-btn-wrap {
+            flex-shrink: 0;
+            padding: 0.75rem 1rem 1rem;
+            background: white;
+            border-top: 1px solid #f1f5f9;
+        }
+        @media (min-width: 640px) {
+            .detalle-btn-wrap { padding: 1rem 2rem 1.5rem; }
+        }
+
+        /* ── Lightbox ── */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        #lightbox.open { display: flex; }
+        #lightbox img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 12px;
+            user-select: none;
+        }
+        #lightbox-prev, #lightbox-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.12);
+            border: none;
+            color: white;
+            font-size: 1.4rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        #lightbox-prev:hover, #lightbox-next:hover { background: rgba(255,255,255,0.25); }
+        #lightbox-prev { left: 12px; }
+        #lightbox-next { right: 12px; }
+        #lightbox-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.12);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #lightbox-close:hover { background: rgba(255,255,255,0.25); }
+        #lightbox-counter {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.1em;
+        }
+
+        /* Botón cerrar modal detalle: más abajo en mobile para que no quede cortado */
+        #btn-cerrar-detalle {
+            top: 12px;
+            right: 12px;
+        }
+        @media (max-width: 639px) {
+            #btn-cerrar-detalle {
+                top: 16px;
+                right: 12px;
+            }
+        }
+
         .cat-btn.active {
             background-color: #0056b3 !important;
             color: white !important;
@@ -88,23 +253,46 @@
             </div>
         </div>
     </nav>
-
-    <header id="inicio" class="hero-section relative h-[42vh] sm:h-[55vh] md:h-[70vh] flex items-center justify-center text-center overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                class="w-full h-full object-cover brightness-50" alt="Muebles">
-        </div>
-        <div class="relative z-10 px-4 max-w-3xl mx-auto">
-            <h1 class="text-3xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tighter mb-2 sm:mb-4 italic leading-tight">
-                Equipa tu casa <br><span class="text-[#ffcc00] underline">con lo mejor</span>
-            </h1>
-            <p class="text-white text-xs sm:text-base md:text-2xl font-semibold mb-5 sm:mb-8 opacity-90">Productos de calidad. Enviamos a todo el Chaco.</p>
-            <a href="#productos" class="bg-red-600 hover:bg-red-700 text-white px-7 py-3 sm:px-10 sm:py-4 md:px-12 md:py-5 rounded-full font-black text-sm sm:text-base md:text-xl uppercase tracking-widest shadow-2xl transition-all inline-block">
+<header id="inicio" class="relative min-h-[55svh] md:min-h-[70vh] flex items-center justify-center text-center overflow-hidden bg-gray-900">
+    
+    <div 
+        class="absolute inset-0 w-full h-full z-0 bg-cover bg-center opacity-50"
+        style="background-image: url('https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1632&auto=format&fit=crop');"
+        aria-hidden="true">
+    </div>
+    
+    <div class="relative z-10 px-6 max-w-4xl mx-auto flex flex-col items-center">
+        
+        <h1 class="text-4xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tight mb-4 leading-tight">
+            Equipa tu casa <br>
+            <span class="text-[#ffcc00] relative inline-block mt-1">
+                con lo mejor
+                <span class="absolute -bottom-2 left-0 w-full h-1.5 md:h-2 bg-[#ffcc00] rounded-full"></span>
+            </span>
+        </h1>
+        
+        <p class="text-gray-200 text-sm sm:text-lg md:text-xl font-medium mb-8 sm:mb-10 max-w-2xl mx-auto drop-shadow-md">
+            Productos de calidad. Enviamos a todo el Chaco.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 mt-2">
+            
+            <a href="#productos" class="bg-[#ffcc00] hover:bg-yellow-400 text-gray-900 px-8 py-3 md:px-10 md:py-4 rounded-full font-black text-base md:text-lg uppercase tracking-widest shadow-[0_0_15px_rgba(255,204,0,0.3)] hover:shadow-[0_0_25px_rgba(255,204,0,0.5)] hover:-translate-y-1 hover:scale-105 transition-all duration-300">
                 Ver Productos
             </a>
-        </div>
-    </header>
 
+            <div class="flex items-center gap-4 sm:gap-5">
+                <a href="#" target="_blank" class="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:border-transparent hover:-translate-y-1 hover:shadow-lg transition-all duration-300" aria-label="Instagram">
+                    <svg class="w-6 h-6 md:w-7 md:h-7 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </a>
+                
+                <a href="#" target="_blank" class="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-[#25D366] hover:border-transparent hover:-translate-y-1 hover:shadow-lg hover:shadow-[#25D366]/30 transition-all duration-300" aria-label="WhatsApp">
+                    <svg class="w-6 h-6 md:w-7 md:h-7 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.309 1.656zm6.29-4.463c1.589.943 3.139 1.416 4.75 1.417 5.405 0 9.803-4.397 9.805-9.805.002-2.618-1.02-5.079-2.877-6.938-1.857-1.858-4.319-2.879-6.938-2.88-5.406 0-9.803 4.398-9.805 9.806-.001 1.83.476 3.614 1.382 5.178l-1.02 3.723 3.818-.999c.002 0 .002 0 .002 0zm11.246-5.495c-.3-.15-1.774-.875-2.048-.976-.275-.1-.475-.15-.674.15-.199.3-.771.976-.945 1.175-.173.199-.349.225-.648.075-.3-.15-1.266-.467-2.41-1.487-.89-.794-1.49-1.775-1.665-2.075-.175-.3-.019-.462.13-.611.135-.133.3-.349.449-.524.149-.175.199-.3.3-.499.1-.2.05-.375-.025-.524-.075-.15-.674-1.625-.924-2.225-.244-.583-.491-.504-.674-.514-.175-.008-.374-.01-.573-.01-.199 0-.524.075-.798.374-.275.3-1.047 1.024-1.047 2.497 0 1.472 1.073 2.895 1.222 3.094.149.199 2.112 3.226 5.117 4.525.714.309 1.272.493 1.706.632.716.227 1.368.195 1.883.118.574-.085 1.774-.724 2.023-1.423.249-.699.249-1.299.175-1.424-.075-.125-.275-.199-.574-.349z"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
     <section class="py-3 sm:py-5 bg-white border-b shadow-sm">
         <div class="container mx-auto px-3 sm:px-4">
             <div class="flex items-center gap-1.5 sm:gap-3 overflow-x-auto no-scrollbar" id="categorias-container">
@@ -113,7 +301,9 @@
                 <button onclick="filtrarCategoria('Cocina')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-red-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Cocina</button>
                 <button onclick="filtrarCategoria('Dormitorio')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-indigo-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Dormitorio</button>
                 <button onclick="filtrarCategoria('Climatización')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-cyan-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Climatización</button>
-                <button onclick="filtrarCategoria('Deco &amp; Otros')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-green-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Otros</button>
+                <button onclick="filtrarCategoria('Electrónica')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-violet-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Electrónica</button>
+                <button onclick="filtrarCategoria('Mates')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-amber-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Mates</button>
+                <button onclick="filtrarCategoria('Deco &amp; Otros')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-green-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Deco &amp; Otros</button>
             </div>
         </div>
     </section>
@@ -182,12 +372,9 @@
     </div>
 </footer>
     <div id="modal-detalles" class="fixed inset-0 bg-black/80 hidden z-[110] flex items-end sm:items-center justify-center sm:p-4 backdrop-blur-sm">
-        <div class="modal-card bg-white w-full sm:max-w-4xl rounded-t-3xl sm:rounded-3xl shadow-2xl relative max-h-[92vh] sm:max-h-[95vh] overflow-hidden flex flex-col">
-            <button onclick="cerrarModal('modal-detalles')" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-lg text-gray-400 hover:text-red-500 z-10 transition-colors bg-white rounded-full shadow">&times;</button>
-            <div class="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
-                <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
-            </div>
-            <div id="detalle-contenido" class="flex flex-col sm:flex-row overflow-y-auto no-scrollbar flex-1">
+        <div class="modal-card bg-white w-full sm:max-w-4xl rounded-t-3xl sm:rounded-3xl shadow-2xl relative max-h-[92vh] sm:max-h-[90vh] flex flex-col" style="overflow:hidden">
+            <div class="rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col flex-1 min-h-0">
+                <div id="detalle-contenido"></div>
             </div>
         </div>
     </div>
@@ -246,6 +433,14 @@
     </div>
 
     <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 translate-y-32 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-2xl z-[300] font-bold text-xs sm:text-sm border border-white/10 whitespace-nowrap max-w-[90vw] overflow-hidden text-ellipsis">
+    </div>
+
+    <div id="lightbox">
+        <button id="lightbox-close" onclick="cerrarLightbox()" aria-label="Cerrar">&times;</button>
+        <button id="lightbox-prev" onclick="lightboxNav(-1)" aria-label="Anterior"><i class="fa-solid fa-chevron-left text-sm"></i></button>
+        <img id="lightbox-img" src="" alt="Imagen ampliada">
+        <button id="lightbox-next" onclick="lightboxNav(1)" aria-label="Siguiente"><i class="fa-solid fa-chevron-right text-sm"></i></button>
+        <span id="lightbox-counter"></span>
     </div>
 
     <script type="module" src="script.js"></script>
