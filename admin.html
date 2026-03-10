@@ -151,7 +151,7 @@
             
             <div class="flex flex-wrap items-center gap-2 w-full xl:w-auto">
                 <div class="relative flex-grow md:flex-grow-0 md:w-64">
-                    <input type="text" id="admin-buscador" placeholder="Buscar..."
+                    <input type="text" id="admin-buscador" placeholder="Buscar por nombre, categoría, stock..."
                         class="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 pl-10 focus:border-[#0056b3] outline-none transition-all font-bold text-xs shadow-sm">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
                 </div>
@@ -168,6 +168,8 @@
                     <option value="Cocina">Cocina</option>
                     <option value="Dormitorio">Dormitorio</option>
                     <option value="Climatización">Climatización</option>
+                    <option value="Electrónica">Electrónica</option>
+                    <option value="Mates">Mates</option>
                     <option value="Deco & Otros">Deco & Otros</option>
                 </select>
 
@@ -215,6 +217,8 @@
                         <option value="Cocina">Cocina</option>
                         <option value="Dormitorio">Dormitorio</option>
                         <option value="Climatización">Climatización</option>
+                        <option value="Electrónica">Electrónica</option>
+                        <option value="Mates">Mates</option>
                         <option value="Deco & Otros">Deco & Otros</option>
                     </select>
                 </div>
@@ -225,6 +229,23 @@
                     <textarea id="descripcion" rows="2" class="w-full bg-slate-50 p-2.5 rounded-lg border border-slate-200 focus:border-[#0056b3] outline-none font-bold text-sm resize-none" placeholder="Breve info..."></textarea>
                     <label class="text-[9px] font-black uppercase text-slate-400 mb-1 mt-2 block tracking-wider">Características Técnicas</label>
                     <textarea id="caracteristicas" rows="2" class="w-full bg-slate-50 p-2.5 rounded-lg border border-slate-200 focus:border-[#0056b3] outline-none font-bold text-sm resize-none" placeholder="Medidas, materiales..."></textarea>
+                </div>
+
+                <!-- ═══ VARIANTES ═══ -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider">Variantes (tamaño, color, etc.)</label>
+                        <span class="text-[9px] text-slate-400 font-semibold italic">Si no hay variantes, se usa el precio base</span>
+                    </div>
+
+                    <div id="variantes-lista" class="space-y-2 mb-2"></div>
+
+                    <button type="button" onclick="agregarVariante()" class="w-full border-2 border-dashed border-slate-200 hover:border-[#0056b3] text-slate-400 hover:text-[#0056b3] py-2 rounded-xl font-black italic uppercase text-[10px] tracking-wider transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-plus text-[9px]"></i> Agregar variante
+                    </button>
+                    <p class="text-[9px] text-slate-400 font-semibold mt-1.5 italic">
+                        <i class="fa-solid fa-circle-info mr-1"></i>Ej: "80x190 (1 plaza)" → $120.000 | "Queen 160x200" → $180.000
+                    </p>
                 </div>
 
                 <!-- ═══ IMÁGENES ═══ -->
@@ -247,12 +268,10 @@
                                 <span class="badge-num">1</span>
                                 <i class="fa-solid fa-camera text-slate-300 text-xl"></i>
                                 <span class="text-[9px] font-black text-slate-300 uppercase tracking-wide">Principal</span>
-                                <!-- Estado: subiendo -->
                                 <div class="upload-spinner-1 hidden flex-col items-center gap-1">
                                     <div class="spinner-mini"></div>
                                     <span class="text-[8px] font-bold text-amber-500 uppercase">Subiendo...</span>
                                 </div>
-                                <!-- Preview -->
                                 <img id="preview-1" class="preview-img hidden" alt="preview">
                                 <div class="upload-overlay">
                                     <i class="fa-solid fa-camera text-white text-lg"></i>
@@ -312,6 +331,78 @@
                                 </button>
                             </div>
                             <input type="hidden" id="img3">
+                        </div>
+
+                        <!-- Zona imagen 4 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="upload-zone" id="zone-4" onclick="triggerFileInput(4)">
+                                <input type="file" id="file-input-4" accept="image/*" onchange="handleFileSelect(event, 4)" onclick="event.stopPropagation()">
+                                <span class="badge-num">4</span>
+                                <i class="fa-solid fa-image text-slate-300 text-xl"></i>
+                                <span class="text-[9px] font-black text-slate-300 uppercase tracking-wide">Extra</span>
+                                <div class="upload-spinner-4 hidden flex-col items-center gap-1">
+                                    <div class="spinner-mini"></div>
+                                    <span class="text-[8px] font-bold text-amber-500 uppercase">Subiendo...</span>
+                                </div>
+                                <img id="preview-4" class="preview-img hidden" alt="preview">
+                                <div class="upload-overlay">
+                                    <i class="fa-solid fa-camera text-white text-lg"></i>
+                                    <span class="text-[9px] font-bold text-white uppercase">Cambiar</span>
+                                </div>
+                                <div id="check-4" class="badge-check hidden"><i class="fa-solid fa-check"></i></div>
+                                <button type="button" id="remove-4" class="remove-btn hidden" onclick="removeImage(event, 4)">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="img4">
+                        </div>
+
+                        <!-- Zona imagen 5 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="upload-zone" id="zone-5" onclick="triggerFileInput(5)">
+                                <input type="file" id="file-input-5" accept="image/*" onchange="handleFileSelect(event, 5)" onclick="event.stopPropagation()">
+                                <span class="badge-num">5</span>
+                                <i class="fa-solid fa-image text-slate-300 text-xl"></i>
+                                <span class="text-[9px] font-black text-slate-300 uppercase tracking-wide">Extra</span>
+                                <div class="upload-spinner-5 hidden flex-col items-center gap-1">
+                                    <div class="spinner-mini"></div>
+                                    <span class="text-[8px] font-bold text-amber-500 uppercase">Subiendo...</span>
+                                </div>
+                                <img id="preview-5" class="preview-img hidden" alt="preview">
+                                <div class="upload-overlay">
+                                    <i class="fa-solid fa-camera text-white text-lg"></i>
+                                    <span class="text-[9px] font-bold text-white uppercase">Cambiar</span>
+                                </div>
+                                <div id="check-5" class="badge-check hidden"><i class="fa-solid fa-check"></i></div>
+                                <button type="button" id="remove-5" class="remove-btn hidden" onclick="removeImage(event, 5)">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="img5">
+                        </div>
+
+                        <!-- Zona imagen 6 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="upload-zone" id="zone-6" onclick="triggerFileInput(6)">
+                                <input type="file" id="file-input-6" accept="image/*" onchange="handleFileSelect(event, 6)" onclick="event.stopPropagation()">
+                                <span class="badge-num">6</span>
+                                <i class="fa-solid fa-image text-slate-300 text-xl"></i>
+                                <span class="text-[9px] font-black text-slate-300 uppercase tracking-wide">Extra</span>
+                                <div class="upload-spinner-6 hidden flex-col items-center gap-1">
+                                    <div class="spinner-mini"></div>
+                                    <span class="text-[8px] font-bold text-amber-500 uppercase">Subiendo...</span>
+                                </div>
+                                <img id="preview-6" class="preview-img hidden" alt="preview">
+                                <div class="upload-overlay">
+                                    <i class="fa-solid fa-camera text-white text-lg"></i>
+                                    <span class="text-[9px] font-bold text-white uppercase">Cambiar</span>
+                                </div>
+                                <div id="check-6" class="badge-check hidden"><i class="fa-solid fa-check"></i></div>
+                                <button type="button" id="remove-6" class="remove-btn hidden" onclick="removeImage(event, 6)">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="img6">
                         </div>
 
                     </div>
@@ -378,6 +469,80 @@
             const campo = document.getElementById('campo-precio-anterior');
             campo.classList.toggle('hidden', !checkbox.checked);
             if (!checkbox.checked) document.getElementById('precioAnterior').value = '';
+        }
+
+        // ── Variantes ──
+        let variantesData = [];
+
+        function agregarVariante(nombre = '', precio = '', disponible = true) {
+            variantesData.push({ nombre, precio, disponible });
+            renderVariantes();
+        }
+
+        function quitarVariante(idx) {
+            variantesData.splice(idx, 1);
+            renderVariantes();
+        }
+
+        function toggleVarianteDisponible(idx) {
+            variantesData[idx].disponible = !variantesData[idx].disponible;
+            renderVariantes();
+        }
+
+        function renderVariantes() {
+            const lista = document.getElementById('variantes-lista');
+            if (variantesData.length === 0) {
+                lista.innerHTML = '';
+                return;
+            }
+            lista.innerHTML = variantesData.map((v, i) => {
+                const disp = v.disponible !== false;
+                return `
+                <div class="flex gap-2 items-start bg-slate-50 border ${disp ? 'border-slate-200' : 'border-orange-200 bg-orange-50'} rounded-xl p-2 transition-all">
+                    <div class="flex-grow min-w-0">
+                        <input
+                            type="text"
+                            value="${v.nombre}"
+                            placeholder="Ej: 80x190 (1 plaza)"
+                            oninput="variantesData[${i}].nombre = this.value"
+                            class="w-full bg-white border border-slate-200 focus:border-[#0056b3] outline-none rounded-lg px-2.5 py-1.5 font-bold text-xs mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] font-black text-slate-400 uppercase flex-shrink-0">$</span>
+                            <input
+                                type="number"
+                                value="${v.precio}"
+                                placeholder="Precio"
+                                oninput="variantesData[${i}].precio = Number(this.value)"
+                                class="flex-grow bg-white border border-slate-200 focus:border-[#0056b3] outline-none rounded-lg px-2.5 py-1.5 font-bold text-xs">
+                            <!-- Toggle stock por variante -->
+                            <button type="button" onclick="toggleVarianteDisponible(${i})"
+                                title="${disp ? 'Marcar como agotada' : 'Marcar como disponible'}"
+                                class="flex-shrink-0 flex items-center gap-1 px-2 py-1.5 rounded-lg font-black text-[9px] uppercase transition-all ${disp
+                                    ? 'bg-green-100 text-green-700 hover:bg-orange-100 hover:text-orange-600'
+                                    : 'bg-orange-100 text-orange-600 hover:bg-green-100 hover:text-green-700'}">
+                                <i class="fa-solid ${disp ? 'fa-circle-check' : 'fa-circle-xmark'} text-[10px]"></i>
+                                ${disp ? 'Stock' : 'Agotado'}
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="quitarVariante(${i})"
+                        class="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-red-50 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-all mt-0.5">
+                        <i class="fa-solid fa-xmark text-[10px]"></i>
+                    </button>
+                </div>
+            `}).join('');
+        }
+
+        function resetVariantes() {
+            variantesData = [];
+            renderVariantes();
+        }
+
+        function cargarVariantesExistentes(variantes) {
+            variantesData = Array.isArray(variantes)
+                ? variantes.map(v => ({ nombre: v.nombre || '', precio: v.precio || 0, disponible: v.disponible !== false }))
+                : [];
+            renderVariantes();
         }
 
         // ── Cloudinary config ──
@@ -521,9 +686,9 @@
             zone.classList.remove('error', 'uploading');
         }
 
-        // Limpia las 3 zonas (llamado desde limpiarForm en admin.js)
+        // Limpia las 6 zonas (llamado desde limpiarForm en admin.js)
         function resetImageZones() {
-            [1, 2, 3].forEach(num => removeImage({ stopPropagation: () => {} }, num));
+            [1, 2, 3, 4, 5, 6].forEach(num => removeImage({ stopPropagation: () => {} }, num));
         }
 
         // Toast accesible desde este script (antes de que cargue el módulo)
