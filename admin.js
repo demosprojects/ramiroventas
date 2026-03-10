@@ -211,7 +211,7 @@ window.guardarProducto = async function() {
     if (imgs.length === 0) return mostrarToast("⚠️ Agregá al menos una imagen");
 
     // Leer variantes desde el array global definido en admin.html
-    const variantesValidas = (typeof variantesData !== 'undefined' ? variantesData : [])
+    const variantesValidas = (typeof window.variantesData !== 'undefined' ? window.variantesData : [])
         .filter(v => v.nombre.trim() !== '' && Number(v.precio) > 0)
         .map(v => ({ nombre: v.nombre.trim(), precio: Number(v.precio), disponible: v.disponible !== false }));
 
