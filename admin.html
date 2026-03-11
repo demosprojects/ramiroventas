@@ -571,7 +571,7 @@
 var variantesData = [];
 
         function agregarVariante(nombre = '', precio = '', disponible = true) {
-            variantesData.push({ nombre, precio, disponible });
+            variantesData.push({ nombre, precio: precio === '' ? '' : precio, disponible });
             renderVariantes();
         }
 
@@ -608,7 +608,7 @@ var variantesData = [];
                                 type="number"
                                 value="${v.precio}"
                                 placeholder="Precio"
-                                oninput="variantesData[${i}].precio = Number(this.value)"
+                                oninput="variantesData[${i}].precio = this.value"
                                 class="flex-grow bg-white border border-slate-200 focus:border-[#0056b3] outline-none rounded-lg px-2.5 py-1.5 font-bold text-xs">
                             <!-- Toggle stock por variante -->
                             <button type="button" onclick="toggleVarianteDisponible(${i})"
