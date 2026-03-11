@@ -116,7 +116,7 @@
                 <img src="logo.jpeg" alt="Logo" class="h-16 w-16 object-contain rounded-lg">
             </div>
             <h1 class="text-[13px] font-black uppercase italic tracking-[0.2em] text-slate-400">
-                Panel <span class="text-[#ffcc00]">Ramiro</span>
+                Ramiro <span class="text-[#ffcc00]">Ventas</span>
             </h1>
         </div>
 
@@ -180,7 +180,7 @@
 
         <div id="loader" class="flex flex-col items-center justify-center py-24">
             <div class="spinner mb-4"></div>
-            <p class="font-black italic text-slate-300 uppercase text-[11px] tracking-widest">Cargando base de datos...</p>
+            <p class="font-black italic text-slate-300 uppercase text-[11px] tracking-widest">Cargando productos...</p>
         </div>
 
         <div id="admin-productos" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 hidden"></div>
@@ -212,6 +212,7 @@
                 <div>
                     <label class="text-[9px] font-black uppercase text-slate-400 mb-1 block tracking-wider">Categoría</label>
                     <select id="categoria" class="w-full bg-slate-50 p-2.5 rounded-lg border border-slate-200 focus:border-[#0056b3] outline-none font-bold text-sm h-[42px]">
+                        <option value="" disabled selected>Seleccione categoría</option>
                         <option value="Dormitorio">Dormitorio</option>
                         <option value="Cocina & Comedor">Cocina & Comedor</option>
                         <option value="Exterior">Exterior</option>
@@ -253,7 +254,7 @@
                             Imágenes del producto
                         </label>
                         <span class="text-[9px] text-slate-400 font-semibold">
-                            <i class="fa-solid fa-circle-info mr-1"></i>Se convierten a WebP automáticamente
+                            <i class="fa-solid fa-circle-info mr-1"></i>Se optimiza automáticamente
                         </span>
                     </div>
 
@@ -437,8 +438,15 @@
 
             <div class="mt-6 flex gap-2">
                 <button onclick="cerrarModalAdmin()" class="flex-1 py-3 text-slate-400 font-bold uppercase text-[10px] tracking-wider hover:bg-slate-50 rounded-xl">Cancelar</button>
-                <button onclick="guardarProducto()" id="btn-guardar" class="flex-[2] bg-[#0056b3] text-white py-3 rounded-xl font-black italic uppercase text-[10px] tracking-wider shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fa-solid fa-floppy-disk mr-1"></i>Guardar Cambios
+                <button onclick="guardarProducto()" id="btn-guardar" class="flex-[2] bg-[#0056b3] text-white py-3 rounded-xl font-black italic uppercase text-[10px] tracking-wider shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed relative">
+                    <span id="btn-guardar-texto" class="flex items-center justify-center gap-1.5 transition-opacity"><i class="fa-solid fa-floppy-disk"></i>Guardar producto</span>
+                    <span id="btn-guardar-spinner" class="hidden absolute inset-0 flex items-center justify-center">
+                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                        </svg>
+                        <span class="ml-2 text-[10px]">Guardando...</span>
+                    </span>
                 </button>
             </div>
         </div>
@@ -457,11 +465,100 @@
         </div>
     </div>
 
+    <!-- ═══════════ MODAL LIGHTBOX ═══════════ -->
+    <div id="modal-lightbox" class="fixed inset-0 bg-black/90 hidden z-[150] flex flex-col items-center justify-center p-4 backdrop-blur-sm" onclick="cerrarLightbox()">
+        <button onclick="cerrarLightbox()" class="absolute top-4 right-4 text-white/60 hover:text-white w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all z-10">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+        <!-- Contador -->
+        <div id="lightbox-counter" class="absolute top-4 left-1/2 -translate-x-1/2 text-white/60 font-black italic uppercase text-[10px] tracking-widest bg-white/10 px-3 py-1 rounded-full hidden"></div>
+        <!-- Imagen principal -->
+        <div class="relative flex items-center justify-center w-full max-w-3xl max-h-[75vh]" onclick="event.stopPropagation()">
+            <button id="lightbox-prev" onclick="lightboxNav(-1)" class="absolute left-0 -translate-x-12 text-white/60 hover:text-white w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all hidden">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <img id="lightbox-img" src="" alt="" class="max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl select-none">
+            <button id="lightbox-next" onclick="lightboxNav(1)" class="absolute right-0 translate-x-12 text-white/60 hover:text-white w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all hidden">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+        <!-- Miniaturas -->
+        <div id="lightbox-thumbs" class="flex gap-2 mt-4 overflow-x-auto no-scrollbar max-w-xl px-2" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <!-- ═══════════ MODAL CERRAR SESIÓN ═══════════ -->
+    <div id="modal-logout" class="fixed inset-0 bg-slate-900/80 hidden z-[130] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-xs w-full text-center shadow-2xl" style="animation: modalPop 0.2s ease-out both;">
+            <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-right-from-bracket text-red-500 text-xl"></i>
+            </div>
+            <h3 class="text-sm font-black uppercase italic mb-1">¿Cerrar sesión?</h3>
+            <p class="text-slate-400 font-bold text-[11px] mb-5">Vas a salir del panel de administración.</p>
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('modal-logout').classList.add('hidden'); document.body.classList.remove('modal-active');" 
+                    class="flex-1 py-2.5 font-bold uppercase text-[10px] text-slate-400 hover:bg-slate-50 rounded-xl transition-all">Cancelar</button>
+                <button id="confirm-logout-btn" class="flex-1 bg-red-500 text-white py-2.5 rounded-xl font-black italic uppercase text-[10px] hover:bg-red-600 transition-all">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i>Salir
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-32 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl z-[200] font-bold italic uppercase text-[10px] transition-all duration-500 flex items-center gap-2 border-b-2 border-yellow-400"></div>
 
     <script type="module" src="admin.js"></script>
 
     <script>
+        // ── Lightbox ──
+        let _lbImgs = [];
+        let _lbIdx  = 0;
+
+        window.abrirLightbox = function(url, imgs) {
+            _lbImgs = Array.isArray(imgs) && imgs.length ? imgs : [url];
+            _lbIdx  = _lbImgs.indexOf(url);
+            if (_lbIdx < 0) _lbIdx = 0;
+            _renderLightbox();
+            document.getElementById('modal-lightbox').classList.remove('hidden');
+            document.body.classList.add('modal-active');
+        };
+
+        window.cerrarLightbox = function() {
+            document.getElementById('modal-lightbox').classList.add('hidden');
+            document.body.classList.remove('modal-active');
+        };
+
+        window.lightboxNav = function(dir) {
+            _lbIdx = (_lbIdx + dir + _lbImgs.length) % _lbImgs.length;
+            _renderLightbox();
+        };
+
+        function _renderLightbox() {
+            document.getElementById('lightbox-img').src = _lbImgs[_lbIdx];
+            const multi = _lbImgs.length > 1;
+            // Contador
+            const counter = document.getElementById('lightbox-counter');
+            counter.classList.toggle('hidden', !multi);
+            counter.textContent = `${_lbIdx + 1} / ${_lbImgs.length}`;
+            // Flechas
+            document.getElementById('lightbox-prev').classList.toggle('hidden', !multi);
+            document.getElementById('lightbox-next').classList.toggle('hidden', !multi);
+            // Miniaturas
+            const thumbs = document.getElementById('lightbox-thumbs');
+            thumbs.innerHTML = multi ? _lbImgs.map((src, i) => `
+                <button onclick="window.lightboxNav(${i - _lbIdx})" class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${i === _lbIdx ? 'border-white scale-105' : 'border-white/20 opacity-50 hover:opacity-80'}">
+                    <img src="${src}" class="w-full h-full object-cover">
+                </button>
+            `).join('') : '';
+        }
+
+        // Navegar con teclado en el lightbox
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('modal-lightbox').classList.contains('hidden')) return;
+            if (e.key === 'ArrowLeft')  lightboxNav(-1);
+            if (e.key === 'ArrowRight') lightboxNav(1);
+            if (e.key === 'Escape')     cerrarLightbox();
+        });
+
         // ── Toggle precio anterior ──
         function togglePrecioAnterior(checkbox) {
             const campo = document.getElementById('campo-precio-anterior');
