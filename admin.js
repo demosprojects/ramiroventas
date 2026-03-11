@@ -267,6 +267,7 @@ window.guardarProducto = async function() {
     } catch (e) {
         console.error("Error al guardar:", e);
         mostrarToast(e.code === "permission-denied" ? "Sin permisos en Firestore" : "Error al guardar");
+    } finally {
         toggleLoader(false);
         btnGuardar.disabled = false;
         btnTexto.classList.remove("opacity-0");
