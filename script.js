@@ -5,6 +5,7 @@ let productos = [];
 let productosFiltrados = [];
 let carrito = JSON.parse(localStorage.getItem("carrito-ramiro")) || [];
 let categoriaActual = "Todos";
+let filtroEstado    = "todos"; // 'todos' | 'disponibles' | 'sin-stock' | 'ofertas'
 
 // ─── NOTIFICACIONES ──────────────────────────────────────────────────────────
 
@@ -214,6 +215,41 @@ window.filtrarCategoria = function(cat) {
     aplicarFiltros();
 };
 
+window.setFiltroEstado = function(estado) {
+    filtroEstado = estado;
+
+    const estilos = {
+        'todos':   { id: 'chip-todos',   cls: 'bg-slate-900 text-white' },
+        'ofertas': { id: 'chip-ofertas', cls: 'bg-red-500 text-white' },
+    };
+    const inactivo = 'bg-gray-100 text-gray-500';
+
+    Object.entries(estilos).forEach(([key, { id, cls }]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const activo = key === estado;
+        el.classList.remove(
+            'bg-slate-900', 'bg-red-500',
+            'text-white', 'bg-gray-100', 'text-gray-500',
+            'hover:bg-red-100', 'hover:text-red-600',
+            'shadow-sm'
+        );
+        if (activo) {
+            cls.split(' ').forEach(c => el.classList.add(c));
+            el.classList.add('shadow-sm');
+        } else {
+            inactivo.split(' ').forEach(c => el.classList.add(c));
+        }
+    });
+
+    const titulo = document.querySelector('#productos h2');
+    if (titulo) {
+        titulo.textContent = estado === 'ofertas' ? 'Ofertas' : 'Productos disponibles';
+    }
+
+    aplicarFiltros();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const buscador = document.getElementById('buscador-principal');
     if (buscador) {
@@ -224,14 +260,22 @@ document.addEventListener('DOMContentLoaded', () => {
 function aplicarFiltros() {
     const buscador = document.getElementById('buscador-principal');
     const texto = (buscador ? buscador.value : '').toLowerCase().trim();
-    
+
     productosFiltrados = productos.filter(p => {
         const matchText =
             p.nombre.toLowerCase().includes(texto) ||
             (p.descripcion && p.descripcion.toLowerCase().includes(texto)) ||
             (p.categoria && p.categoria.toLowerCase().includes(texto));
+
         const matchCat = (categoriaActual === "Todos") || (p.categoria === categoriaActual);
-        return matchText && matchCat;
+
+        let matchEstado = true;
+        if (filtroEstado === 'ofertas') {
+            const variantesEnOferta = Array.isArray(p.variantes) && p.variantes.some(v => v.enOferta === true);
+            matchEstado = p.enOferta === true || variantesEnOferta;
+        }
+
+        return matchText && matchCat && matchEstado;
     });
     renderProductos();
 }
@@ -278,7 +322,8 @@ window.verDetalles = function(id) {
                 <p class="text-[10px] font-black uppercase text-gray-500 mb-2 tracking-wider">Seleccioná tu variante:</p>
                 <div class="flex flex-wrap gap-2" id="variantes-btns">
                     ${p.variantes.map((v) => {
-                        const varDisp = v.disponible !== false;
+                        const varDisp  = v.disponible !== false;
+                        const varOferta = v.enOferta === true && v.precioAnterior;
                         if (!varDisp) {
                             return `
                                 <div class="relative variante-btn-agotada border-2 border-slate-100 rounded-xl px-3 py-2 opacity-60 cursor-not-allowed leading-tight bg-slate-50">
@@ -287,15 +332,22 @@ window.verDetalles = function(id) {
                                     <span class="absolute -top-1.5 -right-1.5 bg-slate-700 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase">Agotado</span>
                                 </div>`;
                         }
+                        const descuento = varOferta ? Math.round(((Number(v.precioAnterior) - Number(v.precio)) / Number(v.precioAnterior)) * 100) : 0;
                         return `
                             <button
                                 type="button"
                                 data-precio="${v.precio}"
                                 data-nombre="${v.nombre}"
+                                data-en-oferta="${v.enOferta === true ? '1' : '0'}"
+                                data-precio-anterior="${v.precioAnterior || ''}"
                                 onclick="seleccionarVariante(this, '${id}')"
-                                class="variante-btn border-2 border-slate-200 text-slate-600 hover:border-[#0056b3] hover:text-[#0056b3] rounded-xl px-3 py-2 font-black text-[11px] uppercase italic transition-all leading-tight">
+                                class="variante-btn relative border-2 border-slate-200 text-slate-600 hover:border-[#0056b3] hover:text-[#0056b3] rounded-xl px-3 py-2 font-black text-[11px] uppercase italic transition-all leading-tight">
+                                ${varOferta ? `<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase">-${descuento}%</span>` : ''}
                                 <span class="block">${v.nombre}</span>
-                                <span class="block text-[10px] font-bold text-[#0056b3] mt-0.5">$${Number(v.precio).toLocaleString('es-AR')}</span>
+                                ${varOferta
+                                    ? `<span class="block text-[9px] font-bold text-red-500 mt-0.5">$${Number(v.precio).toLocaleString('es-AR')} <span class="line-through text-slate-400">$${Number(v.precioAnterior).toLocaleString('es-AR')}</span></span>`
+                                    : `<span class="block text-[10px] font-bold text-[#0056b3] mt-0.5">$${Number(v.precio).toLocaleString('es-AR')}</span>`
+                                }
                             </button>`;
                     }).join('')}
                 </div>
@@ -307,7 +359,7 @@ window.verDetalles = function(id) {
     const sinStockBanner = !disponible
         ? `<div class="bg-orange-50 border border-orange-200 rounded-2xl px-4 py-3 mb-4 flex items-center gap-2">
             <i class="fa-solid fa-circle-exclamation text-orange-400"></i>
-            <p class="text-orange-700 font-black text-xs uppercase italic">Producto sin stock — podés consultar disponibilidad</p>
+            <p class="text-orange-700 font-black text-xs uppercase italic">Producto sin stock</p>
            </div>`
         : '';
 
@@ -449,20 +501,43 @@ let varianteSeleccionada = null; // { nombre, precio }
 window.seleccionarVariante = function(btn, productId) {
     // Desmarcar todos
     document.querySelectorAll('#variantes-btns .variante-btn').forEach(b => {
-        b.classList.remove('border-[#0056b3]', 'bg-blue-50', 'text-[#0056b3]');
+        b.classList.remove('border-[#0056b3]', 'bg-blue-50', 'text-[#0056b3]', 'border-red-400', 'bg-red-50');
         b.classList.add('border-slate-200', 'text-slate-600');
     });
     // Marcar el elegido
-    btn.classList.add('border-[#0056b3]', 'bg-blue-50', 'text-[#0056b3]');
+    const varEnOferta = btn.dataset.enOferta === '1' && btn.dataset.precioAnterior;
     btn.classList.remove('border-slate-200', 'text-slate-600');
+    if (varEnOferta) {
+        btn.classList.add('border-red-400', 'bg-red-50', 'text-red-600');
+    } else {
+        btn.classList.add('border-[#0056b3]', 'bg-blue-50', 'text-[#0056b3]');
+    }
 
-    const precio = Number(btn.dataset.precio);
-    const nombre = btn.dataset.nombre;
+    const precio    = Number(btn.dataset.precio);
+    const nombre    = btn.dataset.nombre;
+    const anterior  = varEnOferta ? Number(btn.dataset.precioAnterior) : null;
     varianteSeleccionada = { nombre, precio, productId };
 
-    // Actualizar precio en pantalla
-    const valEl = document.getElementById('precio-detalle-val');
-    if (valEl) valEl.innerText = `$${precio.toLocaleString('es-AR')}`;
+    // Actualizar bloque de precio en pantalla
+    const wrap = document.getElementById('precio-detalle-wrap');
+    if (wrap) {
+        if (varEnOferta && anterior) {
+            const descuento = Math.round(((anterior - precio) / anterior) * 100);
+            wrap.outerHTML = `
+                <div class="flex items-center gap-3 flex-wrap mb-3 sm:mb-4" id="precio-detalle-wrap">
+                    <p class="text-2xl sm:text-4xl font-black text-red-600" id="precio-detalle-val">$${precio.toLocaleString('es-AR')}</p>
+                    <div class="flex flex-col">
+                        <span class="text-gray-400 font-bold text-sm sm:text-base line-through">$${anterior.toLocaleString('es-AR')}</span>
+                        ${descuento > 0 ? `<span class="bg-red-100 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-md uppercase italic text-center">-${descuento}% OFF</span>` : ''}
+                    </div>
+                </div>`;
+        } else {
+            wrap.outerHTML = `
+                <div id="precio-detalle-wrap" class="mb-3 sm:mb-4">
+                    <p class="text-2xl sm:text-4xl font-black text-[#0056b3]" id="precio-detalle-val">$${precio.toLocaleString('es-AR')}</p>
+                </div>`;
+        }
+    }
 
     // Ocultar aviso
     const aviso = document.getElementById('variante-aviso');
@@ -762,4 +837,3 @@ window.enviarWhatsApp = function() {
 };
 
 cargarProductos();
-
