@@ -50,14 +50,12 @@ const KEYWORDS_AGOTADO     = ['agotado', 'sin stock', 'agotada', 'inactivo'];
 
 // Mapa de alias de categorías para búsqueda por texto
 const ALIAS_CATEGORIAS = {
-    'mobiliario': 'Mobiliario',
-    'mueble': 'Mobiliario', 'muebles': 'Mobiliario',
-    'cocina': 'Cocina',
     'dormitorio': 'Dormitorio', 'cuarto': 'Dormitorio', 'habitacion': 'Dormitorio', 'habitación': 'Dormitorio',
+    'cocina': 'Cocina & Comedor', 'comedor': 'Cocina & Comedor',
+    'exterior': 'Exterior', 'jardin': 'Exterior', 'jardín': 'Exterior', 'patio': 'Exterior',
+    'tecnologia': 'Tecnología', 'tecnología': 'Tecnología', 'electronica': 'Tecnología', 'electrónica': 'Tecnología', 'electronico': 'Tecnología', 'electrónico': 'Tecnología',
     'climatizacion': 'Climatización', 'climatización': 'Climatización', 'aire': 'Climatización', 'calefaccion': 'Climatización', 'calefacción': 'Climatización',
-    'electronica': 'Electrónica', 'electrónica': 'Electrónica', 'electronico': 'Electrónica', 'electrónico': 'Electrónica', 'tecnologia': 'Electrónica', 'tecnología': 'Electrónica',
     'mates': 'Mates', 'mate': 'Mates',
-    'deco': 'Deco & Otros', 'otros': 'Deco & Otros', 'decoracion': 'Deco & Otros', 'decoración': 'Deco & Otros',
 };
 
 function aplicarFiltros() {
@@ -269,7 +267,7 @@ window.editarProducto = function(id) {
     document.getElementById("edit-id").value        = id;
     document.getElementById("nombre").value         = p.nombre;
     document.getElementById("precio").value         = p.precio;
-    document.getElementById("categoria").value      = p.categoria || "Mobiliario";
+    document.getElementById("categoria").value      = p.categoria || "Dormitorio";
     document.getElementById("descripcion").value    = p.descripcion || "";
     document.getElementById("caracteristicas").value = p.caracteristicas || "";
 
@@ -316,7 +314,7 @@ function limpiarForm() {
     ["nombre", "precio", "descripcion", "caracteristicas", "precioAnterior"].forEach(id => {
         document.getElementById(id).value = "";
     });
-    document.getElementById("categoria").value    = "Mobiliario";
+    document.getElementById("categoria").value    = "Dormitorio";
     document.getElementById("disponible").checked = true;
     document.getElementById("enOferta").checked   = false;
     document.getElementById("campo-precio-anterior").classList.add("hidden");
