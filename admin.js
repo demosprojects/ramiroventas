@@ -14,12 +14,24 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ─── LOGOUT ──────────────────────────────────────────────────────────────────
-document.getElementById('btn-logout')?.addEventListener('click', async () => {
+document.getElementById('btn-logout')?.addEventListener('click', () => {
+    document.getElementById('modal-logout').classList.remove('hidden');
+    document.body.classList.add('modal-active');
+});
+
+document.getElementById('confirm-logout-btn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('confirm-logout-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1"></i>Saliendo...`;
     try {
         await signOut(auth);
         window.location.href = "login.html";
     } catch (e) {
-        mostrarToast("❌ Error al cerrar sesión");
+        mostrarToast("Error al cerrar sesión");
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-right-from-bracket mr-1"></i>Salir`;
+        document.getElementById('modal-logout').classList.add('hidden');
+        document.body.classList.remove('modal-active');
     }
 });
 
@@ -36,7 +48,7 @@ async function cargarProductos() {
         aplicarFiltros();
     } catch (e) {
         console.error("Error al cargar:", e);
-        mostrarToast("❌ Error al cargar datos");
+        mostrarToast("Error al cargar datos");
     } finally {
         toggleLoader(false);
     }
@@ -129,15 +141,21 @@ function renderAdmin() {
     container.innerHTML = productosFiltrados.map(p => {
         const disponible = p.disponible !== false;
         const enOferta   = p.enOferta === true;
+        const imgs = p.imagenes || [];
+        const imgsJson = JSON.stringify(imgs).replace(/"/g, '&quot;');
 
         return `
             <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 hover:border-[#0056b3] transition-all group relative">
                 <div class="relative aspect-square rounded-xl overflow-hidden mb-2 bg-slate-50">
-                    <img src="${p.imagenes[0]}" class="w-full h-full object-cover ${!disponible ? 'grayscale opacity-50' : ''}">
+                    <img src="${imgs[0]}" class="w-full h-full object-cover ${!disponible ? 'grayscale opacity-50' : ''}">
                     <div class="absolute top-1.5 left-1.5 flex flex-col gap-1">
                         ${!disponible ? '<span class="stat-pill bg-slate-800 text-white">Agotado</span>' : ''}
                         ${enOferta ? '<span class="stat-pill bg-red-500 text-white">Oferta</span>' : ''}
                     </div>
+                    <button onclick="abrirLightbox(&quot;${imgs[0]}&quot;, ${imgsJson})" 
+                        class="absolute bottom-1.5 right-1.5 bg-black/50 hover:bg-black/80 text-white w-7 h-7 rounded-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm">
+                        <i class="fa-solid fa-magnifying-glass-plus text-[10px]"></i>
+                    </button>
                 </div>
                 <h3 class="font-black text-[10px] uppercase truncate mb-0.5">${p.nombre}</h3>
                 <p class="text-[#0056b3] font-black text-xs">$${Number(p.precio).toLocaleString('es-AR')}</p>
@@ -183,7 +201,7 @@ document.getElementById('confirm-delete-btn')?.addEventListener('click', async (
         await cargarProductos();
     } catch (e) {
         console.error("Error al eliminar:", e);
-        mostrarToast(e.code === "permission-denied" ? "❌ Sin permisos en Firestore" : "❌ Error al borrar");
+        mostrarToast(e.code === "permission-denied" ? "Sin permisos en Firestore" : "Error al borrar");
         toggleLoader(false);
     }
 });
@@ -194,7 +212,8 @@ window.guardarProducto = async function() {
     const nombre = document.getElementById("nombre").value.trim();
     const precio = document.getElementById("precio").value;
 
-    if (!nombre || !precio) return mostrarToast("⚠️ Falta nombre o precio");
+    if (!nombre || !precio) return mostrarToast("Falta nombre o precio");
+    if (!document.getElementById("categoria").value) return mostrarToast("Seleccioná una categoría");
 
     // Leer las URLs desde los inputs hidden populados por el uploader de imágenes
     const imgs = [
@@ -206,7 +225,7 @@ window.guardarProducto = async function() {
         document.getElementById("img6").value.trim()
     ].filter(i => i !== "");
 
-    if (imgs.length === 0) return mostrarToast("⚠️ Agregá al menos una imagen");
+    if (imgs.length === 0) return mostrarToast("Agregá al menos una imagen");
 
     // Leer variantes desde el array global definido en admin.html
     const variantesValidas = (typeof window.variantesData !== 'undefined' ? window.variantesData : [])
@@ -229,20 +248,29 @@ window.guardarProducto = async function() {
     };
 
     toggleLoader(true);
+    const btnGuardar = document.getElementById("btn-guardar");
+    const btnTexto = document.getElementById("btn-guardar-texto");
+    const btnSpinner = document.getElementById("btn-guardar-spinner");
+    btnGuardar.disabled = true;
+    btnTexto.classList.add("opacity-0");
+    btnSpinner.classList.remove("hidden");
     try {
         if (id) {
             await updateDoc(doc(db, "products", id), datos);
-            mostrarToast("✅ Producto actualizado");
+            mostrarToast("Producto actualizado");
         } else {
             await addDoc(collection(db, "products"), { ...datos, fecha: Date.now() });
-            mostrarToast("🚀 Producto creado");
+            mostrarToast("Producto creado");
         }
         cerrarModalAdmin();
         await cargarProductos();
     } catch (e) {
         console.error("Error al guardar:", e);
-        mostrarToast(e.code === "permission-denied" ? "❌ Sin permisos en Firestore" : "❌ Error al guardar");
+        mostrarToast(e.code === "permission-denied" ? "Sin permisos en Firestore" : "Error al guardar");
         toggleLoader(false);
+        btnGuardar.disabled = false;
+        btnTexto.classList.remove("opacity-0");
+        btnSpinner.classList.add("hidden");
     }
 }
 
@@ -250,7 +278,9 @@ window.guardarProducto = async function() {
 window.abrirModalCrear = function() {
     limpiarForm();
     document.getElementById("modal-titulo").innerText = "Nuevo Producto";
+    document.getElementById("btn-guardar-texto").innerText = "Guardar producto";
     document.getElementById("modal-form").classList.remove("hidden");
+    document.getElementById("modal-form").querySelector("div").scrollTop = 0;
     document.body.classList.add("modal-active");
 }
 
@@ -292,7 +322,9 @@ window.editarProducto = function(id) {
     }
 
     document.getElementById("modal-titulo").innerText = "Editar Producto";
+    document.getElementById("btn-guardar-texto").innerText = "Actualizar producto";
     document.getElementById("modal-form").classList.remove("hidden");
+    document.getElementById("modal-form").querySelector("div").scrollTop = 0;
     document.body.classList.add("modal-active");
 }
 
@@ -314,7 +346,7 @@ function limpiarForm() {
     ["nombre", "precio", "descripcion", "caracteristicas", "precioAnterior"].forEach(id => {
         document.getElementById(id).value = "";
     });
-    document.getElementById("categoria").value    = "Dormitorio";
+    document.getElementById("categoria").value    = "";
     document.getElementById("disponible").checked = true;
     document.getElementById("enOferta").checked   = false;
     document.getElementById("campo-precio-anterior").classList.add("hidden");
