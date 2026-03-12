@@ -207,7 +207,7 @@ window.filtrarCategoria = function(cat) {
     document.querySelectorAll('.cat-btn').forEach(btn => {
         btn.classList.remove('active', 'bg-[#0056b3]', 'text-white');
         btn.classList.add('bg-gray-100', 'text-gray-700');
-        if (btn.innerText.trim() === cat || (cat === "Todos" && btn.innerText.trim() === "Ver Todo")) {
+        if (btn.innerText.trim() === cat || (cat === "Todos" && btn.innerText.trim() === "Todos")) {
             btn.classList.add('active');
             btn.classList.remove('bg-gray-100', 'text-gray-700');
         }
@@ -319,7 +319,7 @@ window.verDetalles = function(id) {
     if (tieneVariantes) {
         variantesHTML = `
             <div class="mb-4 sm:mb-5">
-                <p class="text-[10px] font-black uppercase text-gray-500 mb-2 tracking-wider">Seleccioná tu variante:</p>
+                <p class="text-[10px] font-black uppercase text-gray-500 mb-2 tracking-wider">Seleccioná tu opción favorita:</p>
                 <div class="flex flex-wrap gap-2" id="variantes-btns">
                     ${p.variantes.map((v) => {
                         const varDisp  = v.disponible !== false;
@@ -834,6 +834,13 @@ window.enviarWhatsApp = function() {
     });
     msj += `%0A*TOTAL: $${total.toLocaleString('es-AR')}*%0A%0AMuchas gracias!`;
     window.open(`https://wa.me/5493735538773?text=${msj}`);
+
+    // Limpiar el carrito después de enviar el pedido
+    carrito = [];
+    guardarCarrito();
+    actualizarContador();
+    cerrarModal("modal-carrito");
+    showToast("¡Pedido enviado! El carrito fue vaciado.", "success");
 };
 
 cargarProductos();
