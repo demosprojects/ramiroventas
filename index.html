@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAMIRO VENTAS | De todo para tu casa</title>
-    <link rel="icon" href="https://res.cloudinary.com/dnakyanzq/image/upload/v1773017774/ut30op01qzvotfrjlolg.webp">
+    <link rel="icon" href="https://res.cloudinary.com/dl2tftoum/image/upload/v1773538822/gdyps09azhjjppnjp4bo.webp">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -143,6 +143,36 @@
         #lightbox-prev:hover, #lightbox-next:hover { background: rgba(255,255,255,0.25); }
         #lightbox-prev { left: 12px; }
         #lightbox-next { right: 12px; }
+
+        /* ── Scroll to Top ── */
+        #scroll-top {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.25rem;
+            width: 44px;
+            height: 44px;
+            background: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 99;
+            box-shadow: 0 4px 18px rgba(0,86,179,0.35);
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
+        }
+        #scroll-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        #scroll-top:hover { background: #004090; }
         #lightbox-close {
             position: absolute;
             top: 12px;
@@ -249,7 +279,7 @@
     <nav class="bg-white sticky top-0 z-[100] shadow-sm border-b-[3px] border-[#0056b3]">
         <div class="container mx-auto px-3 sm:px-4 py-1.5 sm:py-2 flex justify-between items-center">
             <a href="#" class="flex items-center flex-shrink-0">
-                <img src="logo.jpeg" alt="Ramiro Ventas" class="nav-logo h-11 sm:h-16 md:h-20 object-contain">
+                <img src="https://res.cloudinary.com/dl2tftoum/image/upload/v1773538822/gdyps09azhjjppnjp4bo.webp" alt="Ramiro Ventas" class="nav-logo h-11 sm:h-16 md:h-20 object-contain">
             </a>
 
             <div class="flex items-center gap-2 flex-shrink-0">
@@ -262,15 +292,15 @@
     </nav>
 <header id="inicio" class="relative flex items-center justify-center text-center overflow-hidden bg-gray-900 min-h-[380px] md:min-h-[500px] py-8 md:py-12" data-hero>
     
-  <div 
-    class="absolute inset-0 w-full h-full z-0 bg-cover bg-center opacity-50 blur-sm"
-    style="background-image: url('https://res.cloudinary.com/dl2tftoum/image/upload/v1773279834/rfa48tw9g1ezqrylvrvn.webp');"
-    aria-hidden="true">
-</div>
+    <div 
+        class="absolute inset-0 w-full h-full z-0 bg-cover bg-center opacity-50 blur-sm"
+        style="background-image: url('https://res.cloudinary.com/dl2tftoum/image/upload/v1773279834/rfa48tw9g1ezqrylvrvn.webp');"
+        aria-hidden="true">
+    </div>
     
-    <div class="relative z-10 px-6 max-w-4xl mx-auto flex flex-col items-center">
+    <div class="relative z-10 px-6 max-w-5xl mx-auto flex flex-col items-center">
         
-       <h1 class="text-3xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tight mb-3 md:mb-4 leading-tight">
+        <h1 class="text-3xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tight mb-3 md:mb-4 leading-tight">
             Equipa tu casa <br>
             <span class="relative inline-block mt-1" style="color: #F3F4F6;">
                 con lo mejor
@@ -278,24 +308,28 @@
             </span>
         </h1>
         
-        <p class="text-gray-200 text-xs sm:text-lg md:text-xl font-medium mb-6 md:mb-10 max-w-2xl mx-auto drop-shadow-md">
-            Productos de calidad. Enviamos a todo el Chaco.
+        <p class="text-gray-200 text-xs sm:text-lg md:text-xl font-medium mb-8 md:mb-10 max-w-2xl mx-auto drop-shadow-md">
+            Productos de calidad. Envíos en toda la zona.
         </p>
         
-        <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mt-1">
+        <div class="flex flex-col items-center gap-6 w-full">
             
-            <a href="#productos" class="bg-[#ffcc00] hover:bg-yellow-400 text-gray-900 px-7 py-2.5 md:px-10 md:py-4 rounded-full font-black text-sm md:text-lg uppercase tracking-widest shadow-[0_0_15px_rgba(255,204,0,0.3)] hover:shadow-[0_0_25px_rgba(255,204,0,0.5)] hover:-translate-y-1 hover:scale-105 transition-all duration-300">
+            <a href="#productos" class="w-full sm:w-auto bg-[#ffcc00] hover:bg-yellow-400 text-gray-900 px-10 py-3.5 md:py-4 rounded-full font-black text-sm md:text-lg uppercase tracking-widest shadow-[0_0_15px_rgba(255,204,0,0.3)] hover:shadow-[0_0_25px_rgba(255,204,0,0.5)] hover:-translate-y-1 hover:scale-105 transition-all duration-300">
                 Ver Productos
             </a>
 
-            <div class="flex items-center gap-3 sm:gap-5">
-                <a href="https://www.instagram.com/ramiroventas.shop/" target="_blank" class="group flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:border-transparent hover:-translate-y-1 hover:shadow-lg transition-all duration-300" aria-label="Instagram">
-                    <svg class="w-5 h-5 md:w-7 md:h-7 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            <div class="flex flex-wrap justify-center gap-3 md:gap-4">
+                
+                <a href="https://www.instagram.com/ramiroventas.shop/" target="_blank" class="group flex items-center gap-2 px-5 py-2.5 md:px-7 md:py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:border-transparent hover:-translate-y-1 transition-all duration-300">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    <span class="font-bold uppercase text-xs md:text-sm tracking-wider">¡Seguinos!</span>
                 </a>
                 
-                <a href="https://wa.me/5493735538773" target="_blank" class="group flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-[#25D366] hover:border-transparent hover:-translate-y-1 hover:shadow-lg hover:shadow-[#25D366]/30 transition-all duration-300" aria-label="WhatsApp">
-                    <svg class="w-5 h-5 md:w-7 md:h-7 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.309 1.656zm6.29-4.463c1.589.943 3.139 1.416 4.75 1.417 5.405 0 9.803-4.397 9.805-9.805.002-2.618-1.02-5.079-2.877-6.938-1.857-1.858-4.319-2.879-6.938-2.88-5.406 0-9.803 4.398-9.805 9.806-.001 1.83.476 3.614 1.382 5.178l-1.02 3.723 3.818-.999c.002 0 .002 0 .002 0zm11.246-5.495c-.3-.15-1.774-.875-2.048-.976-.275-.1-.475-.15-.674.15-.199.3-.771.976-.945 1.175-.173.199-.349.225-.648.075-.3-.15-1.266-.467-2.41-1.487-.89-.794-1.49-1.775-1.665-2.075-.175-.3-.019-.462.13-.611.135-.133.3-.349.449-.524.149-.175.199-.3.3-.499.1-.2.05-.375-.025-.524-.075-.15-.674-1.625-.924-2.225-.244-.583-.491-.504-.674-.514-.175-.008-.374-.01-.573-.01-.199 0-.524.075-.798.374-.275.3-1.047 1.024-1.047 2.497 0 1.472 1.073 2.895 1.222 3.094.149.199 2.112 3.226 5.117 4.525.714.309 1.272.493 1.706.632.716.227 1.368.195 1.883.118.574-.085 1.774-.724 2.023-1.423.249-.699.249-1.299.175-1.424-.075-.125-.275-.199-.574-.349z"/></svg>
+                <a href="https://wa.me/5493735538773" target="_blank" class="group flex items-center gap-2 px-5 py-2.5 md:px-7 md:py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-[#25D366] hover:border-transparent hover:-translate-y-1 hover:shadow-lg hover:shadow-[#25D366]/30 transition-all duration-300" aria-label="WhatsApp">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.309 1.656zm6.29-4.463c1.589.943 3.139 1.416 4.75 1.417 5.405 0 9.803-4.397 9.805-9.805.002-2.618-1.02-5.079-2.877-6.938-1.857-1.858-4.319-2.879-6.938-2.88-5.406 0-9.803 4.398-9.805 9.806-.001 1.83.476 3.614 1.382 5.178l-1.02 3.723 3.818-.999c.002 0 .002 0 .002 0zm11.246-5.495c-.3-.15-1.774-.875-2.048-.976-.275-.1-.475-.15-.674.15-.199.3-.771.976-.945 1.175-.173.199-.349.225-.648.075-.3-.15-1.266-.467-2.41-1.487-.89-.794-1.49-1.775-1.665-2.075-.175-.3-.019-.462.13-.611.135-.133.3-.349.449-.524.149-.175.199-.3.3-.499.1-.2.05-.375-.025-.524-.075-.15-.674-1.625-.924-2.225-.244-.583-.491-.504-.674-.514-.175-.008-.374-.01-.573-.01-.199 0-.524.075-.798.374-.275.3-1.047 1.024-1.047 2.497 0 1.472 1.073 2.895 1.222 3.094.149.199 2.112 3.226 5.117 4.525.714.309 1.272.493 1.706.632.716.227 1.368.195 1.883.118.574-.085 1.774-.724 2.023-1.423.249-.699.249-1.299.175-1.424-.075-.125-.275-.199-.574-.349z"/></svg>
+                    <span class="font-bold uppercase text-xs md:text-sm tracking-wider">Consultar</span>
                 </a>
+
             </div>
         </div>
     </div>
@@ -351,7 +385,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-center border-b border-white/10 pb-8 mb-6">
             
             <div class="flex flex-col items-center md:items-start text-center md:text-left">
-                <img src="logo-removido.png" alt="Logo de Ramiro Ventas" class="h-16 md:h-20 object-contain mb-4">
+                <img src="https://res.cloudinary.com/dl2tftoum/image/upload/v1773539017/n2azv6f04cik51zvq5tl.webp" alt="Logo de Ramiro Ventas" class="h-16 md:h-20 object-contain mb-4">
                 <h3 class="text-lg font-black italic text-[#ffcc00] uppercase tracking-tighter">Ramiro Ventas</h3>
                 <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Villa Ángela - Chaco</p>
             </div>
@@ -365,14 +399,11 @@
             <div class="flex flex-col items-center md:items-end gap-4 mt-2 md:mt-0">
                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Seguinos en redes</span>
                 <div class="flex gap-6 text-2xl">
-                    <a href="#" aria-label="Instagram" class="text-white hover:text-[#E1306C] transition-all duration-300 hover:scale-110 hover:-translate-y-1">
+                    <a href="https://www.instagram.com/ramiroventas.shop/" aria-label="Instagram" class="text-white hover:text-[#E1306C] transition-all duration-300 hover:scale-110 hover:-translate-y-1">
                         <i class="fa-brands fa-instagram"></i>
                     </a>
-                    <a href="#" aria-label="WhatsApp" class="text-white hover:text-[#25D366] transition-all duration-300 hover:scale-110 hover:-translate-y-1">
+                    <a href="https://wa.me/5493735538773" aria-label="WhatsApp" class="text-white hover:text-[#25D366] transition-all duration-300 hover:scale-110 hover:-translate-y-1">
                         <i class="fa-brands fa-whatsapp"></i>
-                    </a>
-                    <a href="#" aria-label="Facebook" class="text-white hover:text-[#1877F2] transition-all duration-300 hover:scale-110 hover:-translate-y-1">
-                        <i class="fa-brands fa-facebook"></i>
                     </a>
                 </div>
             </div>
@@ -461,6 +492,24 @@
         <button id="lightbox-next" onclick="lightboxNav(1)" aria-label="Siguiente"><i class="fa-solid fa-chevron-right text-sm"></i></button>
         <span id="lightbox-counter"></span>
     </div>
+
+    <!-- Scroll to Top -->
+    <button id="scroll-top" aria-label="Volver al inicio" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fa-solid fa-chevron-up"></i>
+    </button>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('scroll-top');
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 300) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            }, { passive: true });
+        })();
+    </script>
 
     <script type="module" src="script.js"></script>
 </body>
