@@ -221,6 +221,27 @@
             box-shadow: 0 3px 10px rgba(0,86,179,0.3);
         }
 
+        /* Dropdowns con subcategorías */
+        #btn-dormitorio.subcat-active-indigo {
+            background-color: #6366f1 !important;
+            color: white !important;
+            box-shadow: 0 3px 10px rgba(99,102,241,0.35);
+        }
+        #btn-mates.subcat-active-amber {
+            background-color: #f59e0b !important;
+            color: white !important;
+            box-shadow: 0 3px 10px rgba(245,158,11,0.35);
+        }
+        .subcat-btn.active {
+            background-color: #eef2ff;
+            color: #4f46e5 !important;
+            font-weight: 900;
+        }
+        #menu-mates .subcat-btn.active {
+            background-color: #fffbeb;
+            color: #b45309 !important;
+        }
+
         #toast {
             transition: transform 0.4s cubic-bezier(.17,.67,.4,1.3);
             display: flex;
@@ -275,6 +296,16 @@
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
+
+    <!-- ═══ LOADER DE PRODUCTO (deep link) ═══ -->
+    <div id="product-loader" class="fixed inset-0 bg-white z-[500] flex flex-col items-center justify-center gap-5 hidden">
+        <img src="https://res.cloudinary.com/dl2tftoum/image/upload/v1773538822/gdyps09azhjjppnjp4bo.webp"
+             alt="Ramiro Ventas" class="h-16 object-contain animate-pulse">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-8 h-8 border-[3px] border-gray-200 border-t-[#0056b3] rounded-full animate-spin"></div>
+            <p class="text-[11px] font-black uppercase tracking-widest text-gray-400">Cargando producto...</p>
+        </div>
+    </div>
 
     <nav class="bg-white sticky top-0 z-[100] shadow-sm border-b-[3px] border-[#0056b3]">
         <div class="container mx-auto px-3 sm:px-4 py-1.5 sm:py-2 flex justify-between items-center">
@@ -336,25 +367,207 @@
 </header>
     <section class="py-3 sm:py-5 bg-white border-b shadow-sm">
         <div class="container mx-auto px-3 sm:px-4">
-            <div class="flex items-center gap-1.5 sm:gap-3 overflow-x-auto no-scrollbar" id="categorias-container">
-                <button onclick="filtrarCategoria('Todos')" class="cat-btn active px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm bg-[#0056b3] text-white">Todos</button>
-                <button onclick="filtrarCategoria('Dormitorio')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-indigo-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Dormitorio</button>
-                <button onclick="filtrarCategoria('Cocina &amp; Comedor')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-red-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Cocina &amp; Comedor</button>
-                <button onclick="filtrarCategoria('Exterior')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-green-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Exterior</button>
-                <button onclick="filtrarCategoria('Electrónica')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-violet-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Electrónica</button>
-                <button onclick="filtrarCategoria('Electrodomésticos')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-orange-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Electrodomésticos</button>
-                <button onclick="filtrarCategoria('Climatización')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-cyan-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Climatización</button>
-                <button onclick="filtrarCategoria('Mates')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-amber-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Mates</button>
-                <button onclick="filtrarCategoria('Mochilas')" class="cat-btn bg-gray-100 text-gray-700 hover:bg-teal-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">Mochilas</button>
+            <div class="relative flex items-center gap-1">
+                <!-- Flecha izquierda -->
+                <button id="cat-scroll-left" onclick="scrollCategorias(-1)"
+                    class="hidden sm:flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm text-gray-400 hover:text-[#0056b3] hover:border-[#0056b3] transition-all z-10"
+                    aria-label="Desplazar izquierda">
+                    <i class="fa-solid fa-chevron-left text-[11px]"></i>
+                </button>
+                <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar flex-1" id="categorias-container">
+
+                <button onclick="filtrarCategoria('Todos')" data-cat="Todos"
+                    class="cat-btn active flex-shrink-0 px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm bg-[#0056b3] text-white">
+                    Todos
+                </button>
+
+                <!-- Dormitorio con subcategorías -->
+                <div class="relative flex-shrink-0" id="wrap-dormitorio">
+                    <button id="btn-dormitorio" data-cat="Dormitorio"
+                        onclick="toggleDropdown(event, 'Dormitorio')"
+                        class="cat-btn bg-gray-100 text-gray-700 hover:bg-indigo-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm flex items-center gap-1.5">
+                        Dormitorio
+                        <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" id="chevron-dormitorio"></i>
+                    </button>
+                    <div id="menu-dormitorio"
+                        class="hidden fixed bg-white border border-gray-100 rounded-2xl shadow-xl z-[150] py-1.5 min-w-[200px] max-h-[70vh] overflow-y-auto">
+                        <button onclick="filtrarSubcategoria('Dormitorio', null)" data-subcat=""
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-black uppercase italic text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                            Todos los productos
+                        </button>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <button onclick="filtrarSubcategoria('Dormitorio', 'Colchones y sommiers')" data-subcat="Colchones y sommiers"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                            Colchones y sommiers
+                        </button>
+                        <button onclick="filtrarSubcategoria('Dormitorio', 'Roperos')" data-subcat="Roperos"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                            Roperos
+                        </button>
+                        <button onclick="filtrarSubcategoria('Dormitorio', 'Comodas')" data-subcat="Comodas"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                            Cómodas
+                        </button>
+                        <button onclick="filtrarSubcategoria('Dormitorio', 'Mesas de luz')" data-subcat="Mesas de luz"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                            Mesas de luz
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="filtrarCategoria('Cocina &amp; Comedor')" data-cat="Cocina &amp; Comedor"
+                    class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-red-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
+                    Cocina &amp; Comedor
+                </button>
+                <button onclick="filtrarCategoria('Exterior')" data-cat="Exterior"
+                    class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-green-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
+                    Exterior
+                </button>
+                <button onclick="filtrarCategoria('Electrónica')" data-cat="Electrónica"
+                    class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-violet-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
+                    Electrónica
+                </button>
+                <button onclick="filtrarCategoria('Electrodomésticos')" data-cat="Electrodomésticos"
+                    class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-orange-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
+                    Electrodomésticos
+                </button>
+                <button onclick="filtrarCategoria('Climatización')" data-cat="Climatización"
+                    class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-cyan-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
+                    Climatización
+                </button>
+                <button onclick="filtrarCategoria('Ferreteria y Hogar')" data-cat="Ferreteria y Hogar"
+                    class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-lime-600 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
+                    Ferretería &amp; Hogar
+                </button>
+                <button onclick="filtrarCategoria('Novedades y Varios')" data-cat="Novedades y Varios"
+                    class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-pink-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
+                    Novedades &amp; Varios
+                </button>
+
+                <!-- Mates y Termos con subcategorías -->
+                <div class="relative flex-shrink-0" id="wrap-mates">
+                    <button id="btn-mates" data-cat="Mates y Termos"
+                        onclick="toggleDropdown(event, 'Mates y Termos')"
+                        class="cat-btn bg-gray-100 text-gray-700 hover:bg-amber-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm flex items-center gap-1.5">
+                        Mates y Termos
+                        <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" id="chevron-mates"></i>
+                    </button>
+                    <div id="menu-mates"
+                        class="hidden fixed bg-white border border-gray-100 rounded-2xl shadow-xl z-[150] py-1.5 min-w-[180px] max-h-[70vh] overflow-y-auto">
+                        <button onclick="filtrarSubcategoria('Mates y Termos', null)" data-subcat=""
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-black uppercase italic text-gray-500 hover:bg-amber-50 hover:text-amber-600 transition-colors">
+                            Todos los productos
+                        </button>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <button onclick="filtrarSubcategoria('Mates y Termos', 'Mates')" data-subcat="Mates"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors">
+                            Mates
+                        </button>
+                        <button onclick="filtrarSubcategoria('Mates y Termos', 'Termos')" data-subcat="Termos"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors">
+                            Termos
+                        </button>
+                        <button onclick="filtrarSubcategoria('Mates y Termos', 'Bombillas')" data-subcat="Bombillas"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors">
+                            Bombillas
+                        </button>
+                        <button onclick="filtrarSubcategoria('Mates y Termos', 'Accesorios')" data-subcat="Accesorios"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors">
+                            Accesorios
+                        </button>
+                    </div>
+                </div>
+
+                </div>
+                <!-- Flecha derecha -->
+                <button id="cat-scroll-right" onclick="scrollCategorias(1)"
+                    class="hidden sm:flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm text-gray-400 hover:text-[#0056b3] hover:border-[#0056b3] transition-all z-10"
+                    aria-label="Desplazar derecha">
+                    <i class="fa-solid fa-chevron-right text-[11px]"></i>
+                </button>
             </div>
         </div>
     </section>
 
     <section class="pt-6 pb-2">
         <div class="container mx-auto px-3 sm:px-4">
-            <div class="relative max-w-2xl mx-auto"> <input type="text" id="buscador-principal" placeholder="¿Con qué te vas a equipar?"
-                    class="w-full bg-white border-2 border-gray-200 rounded-2xl py-3.5 px-5 pl-12 focus:border-[#0056b3] outline-none transition-all font-bold text-sm sm:text-base shadow-sm">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+            <div class="relative max-w-2xl mx-auto" id="buscador-wrap">
+                <!-- Barra combinada: texto + selector de categoría -->
+                <div class="flex items-stretch bg-white border-2 border-gray-200 rounded-2xl shadow-sm focus-within:border-[#0056b3] transition-all overflow-visible">
+                    <!-- Input texto -->
+                    <div class="relative flex-1 min-w-0">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base pointer-events-none"></i>
+                        <input type="text" id="buscador-principal" placeholder="¿Con qué te vas a equipar?" autocomplete="off"
+                            class="w-full bg-transparent py-3.5 pl-11 pr-3 outline-none font-bold text-sm sm:text-base text-gray-800 placeholder-gray-400">
+                    </div>
+                    <!-- Divisor -->
+                    <div class="w-px bg-gray-200 my-2.5 flex-shrink-0"></div>
+                    <!-- Selector de categoría -->
+                    <div class="relative flex-shrink-0" id="cat-selector-wrap">
+                        <button id="cat-selector-btn" onclick="toggleCatSelector(event)"
+                            class="flex items-center gap-2 px-4 py-3.5 font-black text-xs sm:text-sm text-gray-500 hover:text-[#0056b3] transition-colors whitespace-nowrap">
+                            <span id="cat-selector-label">Categoría</span>
+                            <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" id="cat-selector-chevron"></i>
+                        </button>
+                        <!-- Dropdown de categorías -->
+                        <div id="cat-selector-menu"
+                            class="hidden fixed bg-white border border-gray-100 rounded-2xl shadow-xl z-[160] py-2 min-w-[200px] overflow-y-auto" style="max-height:min(420px,60vh)">
+                            <button onclick="seleccionarCatSelector('Todos', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2.5 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Todas las categorías
+                            </button>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <button onclick="seleccionarCatSelector('Dormitorio', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Dormitorio
+                            </button>
+                            <div class="pl-6">
+                                <button onclick="seleccionarCatSelector('Dormitorio', 'Colchones y sommiers')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Colchones y sommiers</button>
+                                <button onclick="seleccionarCatSelector('Dormitorio', 'Roperos')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Roperos</button>
+                                <button onclick="seleccionarCatSelector('Dormitorio', 'Comodas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Cómodas</button>
+                                <button onclick="seleccionarCatSelector('Dormitorio', 'Mesas de luz')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Mesas de luz</button>
+                            </div>
+                            <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Cocina &amp; Comedor
+                            </button>
+                            <button onclick="seleccionarCatSelector('Exterior', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Exterior
+                            </button>
+                            <button onclick="seleccionarCatSelector('Electrónica', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Electrónica
+                            </button>
+                            <button onclick="seleccionarCatSelector('Electrodomésticos', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Electrodomésticos
+                            </button>
+                            <button onclick="seleccionarCatSelector('Climatización', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Climatización
+                            </button>
+                            <button onclick="seleccionarCatSelector('Ferreteria y Hogar', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Ferretería &amp; Hogar
+                            </button>
+                            <button onclick="seleccionarCatSelector('Novedades y Varios', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Novedades &amp; Varios
+                            </button>
+                            <button onclick="seleccionarCatSelector('Mates y Termos', null)"
+                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
+                                Mates y Termos
+                            </button>
+                            <div class="pl-6">
+                                <button onclick="seleccionarCatSelector('Mates y Termos', 'Mates')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Mates</button>
+                                <button onclick="seleccionarCatSelector('Mates y Termos', 'Termos')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Termos</button>
+                                <button onclick="seleccionarCatSelector('Mates y Termos', 'Bombillas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Bombillas</button>
+                                <button onclick="seleccionarCatSelector('Mates y Termos', 'Accesorios')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Accesorios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- Chips de filtro rápido -->
             <div class="flex items-center gap-2 mt-3 max-w-2xl mx-auto overflow-x-auto no-scrollbar pb-1">
