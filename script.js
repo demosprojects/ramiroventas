@@ -279,6 +279,8 @@ window.filtrarCategoria = function(cat) {
         }
     });
     aplicarFiltros();
+    // Scroll suave hacia la sección de productos
+    document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth' });
 };
 
 window.filtrarSubcategoria = function(categoria, subcategoria) {
@@ -304,6 +306,8 @@ window.filtrarSubcategoria = function(categoria, subcategoria) {
         if (primerBtn) primerBtn.classList.add('active');
     }
     aplicarFiltros();
+    // Scroll suave hacia la sección de productos
+    document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth' });
 };
 
 // Cerrar menús al hacer click fuera — se registra una vez al cargar el módulo
