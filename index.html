@@ -227,6 +227,11 @@
             color: white !important;
             box-shadow: 0 3px 10px rgba(99,102,241,0.35);
         }
+        #btn-cocina.subcat-active-red {
+            background-color: #ef4444 !important;
+            color: white !important;
+            box-shadow: 0 3px 10px rgba(239,68,68,0.35);
+        }
         #btn-mates.subcat-active-amber {
             background-color: #f59e0b !important;
             color: white !important;
@@ -236,6 +241,10 @@
             background-color: #eef2ff;
             color: #4f46e5 !important;
             font-weight: 900;
+        }
+        #menu-cocina .subcat-btn.active {
+            background-color: #fee2e2;
+            color: #b91c1c !important;
         }
         #menu-mates .subcat-btn.active {
             background-color: #fffbeb;
@@ -415,10 +424,43 @@
                     </div>
                 </div>
 
-                <button onclick="filtrarCategoria('Cocina &amp; Comedor')" data-cat="Cocina &amp; Comedor"
-                    class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-red-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
-                    Cocina &amp; Comedor
-                </button>
+                <!-- Cocina & Comedor con subcategorías -->
+                <div class="relative flex-shrink-0" id="wrap-cocina">
+                    <button id="btn-cocina" data-cat="Cocina &amp; Comedor"
+                        onclick="toggleDropdown(event, 'Cocina &amp; Comedor')"
+                        class="cat-btn bg-gray-100 text-gray-700 hover:bg-red-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm flex items-center gap-1.5">
+                        Cocina &amp; Comedor
+                        <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" id="chevron-cocina"></i>
+                    </button>
+                    <div id="menu-cocina"
+                        class="hidden fixed bg-white border border-gray-100 rounded-2xl shadow-xl z-[150] py-1.5 min-w-[200px] max-h-[70vh] overflow-y-auto">
+                        <button onclick="filtrarSubcategoria('Cocina &amp; Comedor', null)" data-subcat=""
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-black uppercase italic text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors">
+                            Todos los productos
+                        </button>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <button onclick="filtrarSubcategoria('Cocina &amp; Comedor', 'Modulares')" data-subcat="Modulares"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
+                            Modulares
+                        </button>
+                        <button onclick="filtrarSubcategoria('Cocina &amp; Comedor', 'Sillas / mesas')" data-subcat="Sillas / mesas"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
+                            Sillas / mesas
+                        </button>
+                        <button onclick="filtrarSubcategoria('Cocina &amp; Comedor', 'Bajo mesada')" data-subcat="Bajo mesada"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
+                            Bajo mesada
+                        </button>
+                        <button onclick="filtrarSubcategoria('Cocina &amp; Comedor', 'Alacenas')" data-subcat="Alacenas"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
+                            Alacenas
+                        </button>
+                        <button onclick="filtrarSubcategoria('Cocina &amp; Comedor', 'Despenseros y bibliotecas')" data-subcat="Despenseros y bibliotecas"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
+                            Despenseros y bibliotecas
+                        </button>
+                    </div>
+                </div>
                 <button onclick="filtrarCategoria('Exterior')" data-cat="Exterior"
                     class="cat-btn flex-shrink-0 bg-gray-100 text-gray-700 hover:bg-green-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm">
                     Exterior
@@ -444,34 +486,34 @@
                     Novedades &amp; Varios
                 </button>
 
-                <!-- Mates y Termos con subcategorías -->
+                <!-- Mates & Termos con subcategorías -->
                 <div class="relative flex-shrink-0" id="wrap-mates">
-                    <button id="btn-mates" data-cat="Mates y Termos"
-                        onclick="toggleDropdown(event, 'Mates y Termos')"
+                    <button id="btn-mates" data-cat="Mates &amp; Termos"
+                        onclick="toggleDropdown(event, 'Mates &amp; Termos')"
                         class="cat-btn bg-gray-100 text-gray-700 hover:bg-amber-500 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm flex items-center gap-1.5">
-                        Mates y Termos
+                        Mates &amp; Termos
                         <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" id="chevron-mates"></i>
                     </button>
                     <div id="menu-mates"
                         class="hidden fixed bg-white border border-gray-100 rounded-2xl shadow-xl z-[150] py-1.5 min-w-[180px] max-h-[70vh] overflow-y-auto">
-                        <button onclick="filtrarSubcategoria('Mates y Termos', null)" data-subcat=""
+                        <button onclick="filtrarSubcategoria('Mates &amp; Termos', null)" data-subcat=""
                             class="subcat-btn w-full text-left px-4 py-2 text-xs font-black uppercase italic text-gray-500 hover:bg-amber-50 hover:text-amber-600 transition-colors">
                             Todos los productos
                         </button>
                         <div class="border-t border-gray-100 my-1"></div>
-                        <button onclick="filtrarSubcategoria('Mates y Termos', 'Mates')" data-subcat="Mates"
+                        <button onclick="filtrarSubcategoria('Mates &amp; Termos', 'Mates')" data-subcat="Mates"
                             class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors">
                             Mates
                         </button>
-                        <button onclick="filtrarSubcategoria('Mates y Termos', 'Termos')" data-subcat="Termos"
+                        <button onclick="filtrarSubcategoria('Mates &amp; Termos', 'Termos')" data-subcat="Termos"
                             class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors">
                             Termos
                         </button>
-                        <button onclick="filtrarSubcategoria('Mates y Termos', 'Bombillas')" data-subcat="Bombillas"
+                        <button onclick="filtrarSubcategoria('Mates &amp; Termos', 'Bombillas')" data-subcat="Bombillas"
                             class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors">
                             Bombillas
                         </button>
-                        <button onclick="filtrarSubcategoria('Mates y Termos', 'Accesorios')" data-subcat="Accesorios"
+                        <button onclick="filtrarSubcategoria('Mates &amp; Termos', 'Accesorios')" data-subcat="Accesorios"
                             class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors">
                             Accesorios
                         </button>
@@ -531,6 +573,13 @@
                                 class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
                                 Cocina &amp; Comedor
                             </button>
+                            <div class="pl-6">
+                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Modulares')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Modulares</button>
+                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Sillas / mesas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Sillas / mesas</button>
+                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Bajo mesada')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Bajo mesada</button>
+                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Alacenas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Alacenas</button>
+                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Despenseros y bibliotecas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Despenseros y bibliotecas</button>
+                            </div>
                             <button onclick="seleccionarCatSelector('Exterior', null)"
                                 class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
                                 Exterior
@@ -555,15 +604,15 @@
                                 class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
                                 Novedades &amp; Varios
                             </button>
-                            <button onclick="seleccionarCatSelector('Mates y Termos', null)"
+                            <button onclick="seleccionarCatSelector('Mates &amp; Termos', null)"
                                 class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
-                                Mates y Termos
+                                Mates &amp; Termos
                             </button>
                             <div class="pl-6">
-                                <button onclick="seleccionarCatSelector('Mates y Termos', 'Mates')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Mates</button>
-                                <button onclick="seleccionarCatSelector('Mates y Termos', 'Termos')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Termos</button>
-                                <button onclick="seleccionarCatSelector('Mates y Termos', 'Bombillas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Bombillas</button>
-                                <button onclick="seleccionarCatSelector('Mates y Termos', 'Accesorios')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Accesorios</button>
+                                <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Mates')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Mates</button>
+                                <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Termos')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Termos</button>
+                                <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Bombillas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Bombillas</button>
+                                <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Accesorios')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Accesorios</button>
                             </div>
                         </div>
                     </div>
