@@ -223,8 +223,9 @@ function renderProductos() {
 
 // Configuración de categorías con dropdown (cat principal → color activo)
 const DROPDOWN_CONFIG = {
-    'Dormitorio':      { btnId: 'btn-dormitorio',   menuId: 'menu-dormitorio',   chevronId: 'chevron-dormitorio',   wrapId: 'wrap-dormitorio',   activeClass: 'subcat-active-indigo' },
-    'Mates y Termos':  { btnId: 'btn-mates',        menuId: 'menu-mates',        chevronId: 'chevron-mates',        wrapId: 'wrap-mates',        activeClass: 'subcat-active-amber'  },
+    'Dormitorio':        { btnId: 'btn-dormitorio',   menuId: 'menu-dormitorio',   chevronId: 'chevron-dormitorio',   wrapId: 'wrap-dormitorio',   activeClass: 'subcat-active-indigo' },
+    'Cocina & Comedor':  { btnId: 'btn-cocina',       menuId: 'menu-cocina',       chevronId: 'chevron-cocina',       wrapId: 'wrap-cocina',       activeClass: 'subcat-active-red'    },
+    'Mates & Termos':    { btnId: 'btn-mates',        menuId: 'menu-mates',        chevronId: 'chevron-mates',        wrapId: 'wrap-mates',        activeClass: 'subcat-active-amber'  },
 };
 
 function cerrarTodosLosMenus() {
@@ -238,7 +239,7 @@ function cerrarTodosLosMenus() {
 
 function desactivarTodosBotones() {
     document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.classList.remove('active', 'bg-[#0056b3]', 'text-white', 'subcat-active-indigo', 'subcat-active-amber');
+        btn.classList.remove('active', 'bg-[#0056b3]', 'text-white', 'subcat-active-indigo', 'subcat-active-red', 'subcat-active-amber');
         btn.classList.add('bg-gray-100', 'text-gray-700');
     });
     document.querySelectorAll('.subcat-btn').forEach(b => b.classList.remove('active'));
