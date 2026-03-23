@@ -227,6 +227,15 @@
             color: white !important;
             box-shadow: 0 3px 10px rgba(99,102,241,0.35);
         }
+        #btn-colchones.subcat-active-purple {
+            background-color: #7c3aed !important;
+            color: white !important;
+            box-shadow: 0 3px 10px rgba(124,58,237,0.35);
+        }
+        #menu-colchones .subcat-btn.active {
+            background-color: #ede9fe;
+            color: #6d28d9 !important;
+        }
         #btn-cocina.subcat-active-red {
             background-color: #ef4444 !important;
             color: white !important;
@@ -390,6 +399,44 @@
                     Todos
                 </button>
 
+                <!-- Colchones & Sommiers con subcategorías -->
+                <div class="relative flex-shrink-0" id="wrap-colchones">
+                    <button id="btn-colchones" data-cat="Colchones &amp; Sommiers"
+                        onclick="toggleDropdown(event, 'Colchones &amp; Sommiers')"
+                        class="cat-btn bg-gray-100 text-gray-700 hover:bg-violet-600 hover:text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-bold whitespace-nowrap transition-all text-xs sm:text-sm flex items-center gap-1.5">
+                        Colchones &amp; Sommiers
+                        <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200" id="chevron-colchones"></i>
+                    </button>
+                    <div id="menu-colchones"
+                        class="hidden fixed bg-white border border-gray-100 rounded-2xl shadow-xl z-[150] py-1.5 min-w-[200px] max-h-[70vh] overflow-y-auto">
+                        <button onclick="filtrarSubcategoria('Colchones &amp; Sommiers', null)" data-subcat=""
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-black uppercase italic text-gray-500 hover:bg-violet-50 hover:text-violet-600 transition-colors">
+                            Todos los productos
+                        </button>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <button onclick="filtrarSubcategoria('Colchones &amp; Sommiers', '1 plaza')" data-subcat="1 plaza"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors">
+                            1 plaza
+                        </button>
+                        <button onclick="filtrarSubcategoria('Colchones &amp; Sommiers', '1 plaza y media')" data-subcat="1 plaza y media"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors">
+                            1 plaza y media
+                        </button>
+                        <button onclick="filtrarSubcategoria('Colchones &amp; Sommiers', '2 plazas')" data-subcat="2 plazas"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors">
+                            2 plazas
+                        </button>
+                        <button onclick="filtrarSubcategoria('Colchones &amp; Sommiers', '2 plaza y media')" data-subcat="2 plaza y media"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors">
+                            2 plaza y media
+                        </button>
+                        <button onclick="filtrarSubcategoria('Colchones &amp; Sommiers', '2 x 2')" data-subcat="2 x 2"
+                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors">
+                            2 x 2
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Dormitorio con subcategorías -->
                 <div class="relative flex-shrink-0" id="wrap-dormitorio">
                     <button id="btn-dormitorio" data-cat="Dormitorio"
@@ -405,10 +452,6 @@
                             Todos los productos
                         </button>
                         <div class="border-t border-gray-100 my-1"></div>
-                        <button onclick="filtrarSubcategoria('Dormitorio', 'Colchones y sommiers')" data-subcat="Colchones y sommiers"
-                            class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
-                            Colchones y sommiers
-                        </button>
                         <button onclick="filtrarSubcategoria('Dormitorio', 'Roperos')" data-subcat="Roperos"
                             class="subcat-btn w-full text-left px-4 py-2 text-xs font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                             Roperos
@@ -553,33 +596,65 @@
                         </button>
                         <!-- Dropdown de categorías -->
                         <div id="cat-selector-menu"
-                            class="hidden fixed bg-white border border-gray-100 rounded-2xl shadow-xl z-[160] py-2 min-w-[200px] overflow-y-auto" style="max-height:min(420px,60vh)">
+                            class="hidden fixed bg-white border border-gray-100 rounded-2xl shadow-xl z-[160] py-2 min-w-[220px] overflow-y-auto" style="max-height:min(420px,60vh)">
+
+                            <!-- Todas -->
                             <button onclick="seleccionarCatSelector('Todos', null)"
                                 class="cat-sel-item w-full text-left px-4 py-2.5 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
                                 Todas las categorías
                             </button>
                             <div class="border-t border-gray-100 my-1"></div>
-                            <button onclick="seleccionarCatSelector('Dormitorio', null)"
-                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
-                                Dormitorio
-                            </button>
-                            <div class="pl-6">
-                                <button onclick="seleccionarCatSelector('Dormitorio', 'Colchones y sommiers')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Colchones y sommiers</button>
-                                <button onclick="seleccionarCatSelector('Dormitorio', 'Roperos')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Roperos</button>
-                                <button onclick="seleccionarCatSelector('Dormitorio', 'Comodas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Cómodas</button>
-                                <button onclick="seleccionarCatSelector('Dormitorio', 'Mesas de luz')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Mesas de luz</button>
+
+                            <!-- Colchones & Sommiers (acordeón) -->
+                            <div class="cat-acord-wrap">
+                                <button onclick="toggleCatAcord('acord-colchones', this)"
+                                    class="w-full flex items-center justify-between px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors text-left">
+                                    <span>Colchones &amp; Sommiers</span>
+                                    <i class="fa-solid fa-chevron-right text-[9px] transition-transform duration-200 flex-shrink-0 ml-2"></i>
+                                </button>
+                                <div id="acord-colchones" class="hidden pb-1">
+                                    <button onclick="seleccionarCatSelector('Colchones &amp; Sommiers', null)" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors text-[11px] font-black text-violet-400 italic">→ Ver todos</button>
+                                    <button onclick="seleccionarCatSelector('Colchones &amp; Sommiers', '1 plaza')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">1 plaza</button>
+                                    <button onclick="seleccionarCatSelector('Colchones &amp; Sommiers', '1 plaza y media')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">1 plaza y media</button>
+                                    <button onclick="seleccionarCatSelector('Colchones &amp; Sommiers', '2 plazas')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">2 plazas</button>
+                                    <button onclick="seleccionarCatSelector('Colchones &amp; Sommiers', '2 plaza y media')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">2 plaza y media</button>
+                                    <button onclick="seleccionarCatSelector('Colchones &amp; Sommiers', '2 x 2')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-violet-50 hover:text-violet-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">2 x 2</button>
+                                </div>
                             </div>
-                            <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', null)"
-                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
-                                Cocina &amp; Comedor
-                            </button>
-                            <div class="pl-6">
-                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Modulares')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Modulares</button>
-                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Sillas / mesas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Sillas / mesas</button>
-                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Bajo mesada')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Bajo mesada</button>
-                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Alacenas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Alacenas</button>
-                                <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Despenseros y bibliotecas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Despenseros y bibliotecas</button>
+
+                            <!-- Dormitorio (acordeón) -->
+                            <div class="cat-acord-wrap">
+                                <button onclick="toggleCatAcord('acord-dormitorio', this)"
+                                    class="w-full flex items-center justify-between px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors text-left">
+                                    <span>Dormitorio</span>
+                                    <i class="fa-solid fa-chevron-right text-[9px] transition-transform duration-200 flex-shrink-0 ml-2"></i>
+                                </button>
+                                <div id="acord-dormitorio" class="hidden pb-1">
+                                    <button onclick="seleccionarCatSelector('Dormitorio', null)" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-black text-indigo-400 italic">→ Ver todos</button>
+                                    <button onclick="seleccionarCatSelector('Dormitorio', 'Roperos')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Roperos</button>
+                                    <button onclick="seleccionarCatSelector('Dormitorio', 'Comodas')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Cómodas</button>
+                                    <button onclick="seleccionarCatSelector('Dormitorio', 'Mesas de luz')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Mesas de luz</button>
+                                </div>
                             </div>
+
+                            <!-- Cocina & Comedor (acordeón) -->
+                            <div class="cat-acord-wrap">
+                                <button onclick="toggleCatAcord('acord-cocina', this)"
+                                    class="w-full flex items-center justify-between px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors text-left">
+                                    <span>Cocina &amp; Comedor</span>
+                                    <i class="fa-solid fa-chevron-right text-[9px] transition-transform duration-200 flex-shrink-0 ml-2"></i>
+                                </button>
+                                <div id="acord-cocina" class="hidden pb-1">
+                                    <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', null)" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-black text-red-400 italic">→ Ver todos</button>
+                                    <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Modulares')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Modulares</button>
+                                    <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Sillas / mesas')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Sillas / mesas</button>
+                                    <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Bajo mesada')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Bajo mesada</button>
+                                    <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Alacenas')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Alacenas</button>
+                                    <button onclick="seleccionarCatSelector('Cocina &amp; Comedor', 'Despenseros y bibliotecas')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Despenseros y bibliotecas</button>
+                                </div>
+                            </div>
+
+                            <!-- Sin subcategorías -->
                             <button onclick="seleccionarCatSelector('Exterior', null)"
                                 class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
                                 Exterior
@@ -604,16 +679,23 @@
                                 class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
                                 Novedades &amp; Varios
                             </button>
-                            <button onclick="seleccionarCatSelector('Mates &amp; Termos', null)"
-                                class="cat-sel-item w-full text-left px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors">
-                                Mates &amp; Termos
-                            </button>
-                            <div class="pl-6">
-                                <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Mates')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Mates</button>
-                                <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Termos')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Termos</button>
-                                <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Bombillas')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Bombillas</button>
-                                <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Accesorios')" class="cat-sel-subitem w-full text-left px-3 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Accesorios</button>
+
+                            <!-- Mates & Termos (acordeón) -->
+                            <div class="cat-acord-wrap">
+                                <button onclick="toggleCatAcord('acord-mates', this)"
+                                    class="w-full flex items-center justify-between px-4 py-2 text-xs font-black text-gray-700 hover:bg-blue-50 hover:text-[#0056b3] transition-colors text-left">
+                                    <span>Mates &amp; Termos</span>
+                                    <i class="fa-solid fa-chevron-right text-[9px] transition-transform duration-200 flex-shrink-0 ml-2"></i>
+                                </button>
+                                <div id="acord-mates" class="hidden pb-1">
+                                    <button onclick="seleccionarCatSelector('Mates &amp; Termos', null)" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-black text-amber-400 italic">→ Ver todos</button>
+                                    <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Mates')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Mates</button>
+                                    <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Termos')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Termos</button>
+                                    <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Bombillas')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Bombillas</button>
+                                    <button onclick="seleccionarCatSelector('Mates &amp; Termos', 'Accesorios')" class="cat-sel-subitem w-full text-left px-5 py-1.5 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors text-[11px] font-bold text-gray-500">Accesorios</button>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
