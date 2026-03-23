@@ -70,6 +70,14 @@ async function cargarProductos() {
     try {
         const querySnapshot = await getDocs(collection(db, "products"));
         productos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // ── Colchones & Sommiers siempre primero ──
+        productos.sort((a, b) => {
+            const esColchonA = a.categoria === 'Colchones & Sommiers' ? 0 : 1;
+            const esColchonB = b.categoria === 'Colchones & Sommiers' ? 0 : 1;
+            return esColchonA - esColchonB;
+        });
+
         productosFiltrados = [...productos];
 
         // ── Verificar stock de los items en el carrito ──
@@ -223,9 +231,10 @@ function renderProductos() {
 
 // Configuración de categorías con dropdown (cat principal → color activo)
 const DROPDOWN_CONFIG = {
-    'Dormitorio':        { btnId: 'btn-dormitorio',   menuId: 'menu-dormitorio',   chevronId: 'chevron-dormitorio',   wrapId: 'wrap-dormitorio',   activeClass: 'subcat-active-indigo' },
-    'Cocina & Comedor':  { btnId: 'btn-cocina',       menuId: 'menu-cocina',       chevronId: 'chevron-cocina',       wrapId: 'wrap-cocina',       activeClass: 'subcat-active-red'    },
-    'Mates & Termos':    { btnId: 'btn-mates',        menuId: 'menu-mates',        chevronId: 'chevron-mates',        wrapId: 'wrap-mates',        activeClass: 'subcat-active-amber'  },
+    'Dormitorio':           { btnId: 'btn-dormitorio',  menuId: 'menu-dormitorio',  chevronId: 'chevron-dormitorio',  wrapId: 'wrap-dormitorio',  activeClass: 'subcat-active-indigo' },
+    'Colchones & Sommiers': { btnId: 'btn-colchones',   menuId: 'menu-colchones',   chevronId: 'chevron-colchones',   wrapId: 'wrap-colchones',   activeClass: 'subcat-active-purple' },
+    'Cocina & Comedor':     { btnId: 'btn-cocina',      menuId: 'menu-cocina',      chevronId: 'chevron-cocina',      wrapId: 'wrap-cocina',      activeClass: 'subcat-active-red'    },
+    'Mates & Termos':       { btnId: 'btn-mates',       menuId: 'menu-mates',       chevronId: 'chevron-mates',       wrapId: 'wrap-mates',       activeClass: 'subcat-active-amber'  },
 };
 
 function cerrarTodosLosMenus() {
@@ -239,7 +248,7 @@ function cerrarTodosLosMenus() {
 
 function desactivarTodosBotones() {
     document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.classList.remove('active', 'bg-[#0056b3]', 'text-white', 'subcat-active-indigo', 'subcat-active-red', 'subcat-active-amber');
+        btn.classList.remove('active', 'bg-[#0056b3]', 'text-white', 'subcat-active-indigo', 'subcat-active-purple', 'subcat-active-red', 'subcat-active-amber');
         btn.classList.add('bg-gray-100', 'text-gray-700');
     });
     document.querySelectorAll('.subcat-btn').forEach(b => b.classList.remove('active'));
@@ -410,7 +419,29 @@ function cerrarCatSelector() {
     const chevron = document.getElementById('cat-selector-chevron');
     if (menu)    menu.classList.add('hidden');
     if (chevron) chevron.style.transform = 'rotate(0deg)';
+    // Colapsar todos los acordeones internos
+    document.querySelectorAll('[id^="acord-"]').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.cat-acord-wrap > button i').forEach(i => {
+        i.style.transform = 'rotate(0deg)';
+    });
 }
+
+window.toggleCatAcord = function(id, btn) {
+    const panel = document.getElementById(id);
+    // El icono está dentro del mismo botón (btn es el botón padre completo)
+    const icon = btn.querySelector('i');
+    if (!panel) return;
+    const isOpen = !panel.classList.contains('hidden');
+    // Cerrar todos los acordeones y resetear íconos
+    document.querySelectorAll('[id^="acord-"]').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.cat-acord-wrap > button i').forEach(i => {
+        i.style.transform = 'rotate(0deg)';
+    });
+    if (!isOpen) {
+        panel.classList.remove('hidden');
+        if (icon) icon.style.transform = 'rotate(90deg)';
+    }
+};
 
 window.seleccionarCatSelector = function(cat, sub) {
     cerrarCatSelector();
