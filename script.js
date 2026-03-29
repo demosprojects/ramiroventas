@@ -86,14 +86,24 @@ async function cargarProductos() {
         renderProductos();
         actualizarContador();
 
-        // ── Deep link: ?producto=ID ──
+        // ── Deep link: ?producto=ID&variante=NOMBRE ──
         const paramProd = new URLSearchParams(window.location.search).get('producto');
+        const paramVariante = new URLSearchParams(window.location.search).get('variante');
         if (paramProd) {
             const loader = document.getElementById('product-loader');
             if (loader) loader.classList.add('hidden');
             const existe = productos.find(p => p.id === paramProd);
             if (existe) {
                 verDetalles(paramProd);
+                // Auto-seleccionar variante si viene en la URL
+                // (setTimeout para esperar a que el DOM del modal esté renderizado)
+                if (paramVariante) {
+                    setTimeout(() => {
+                        const btnVariante = [...document.querySelectorAll('#variantes-btns .variante-btn')]
+                            .find(b => b.dataset.nombre === paramVariante);
+                        if (btnVariante) btnVariante.click();
+                    }, 50);
+                }
             }
             // Limpiar el param de la URL sin recargar
             history.replaceState(null, '', window.location.pathname);
@@ -594,20 +604,27 @@ window.verDetalles = function(id) {
            </div>`
         : '';
 
-    const btnCerrarInline = `<button onclick="cerrarModal('modal-detalles')" class="flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200 py-3.5 px-4 rounded-2xl font-black transition-colors text-sm uppercase flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-xmark"></i> Cerrar
-           </button>`;
-
     const btnDetalle = disponible
-        ? `<div class="flex gap-2">${btnCerrarInline}<button onclick="agregarCarrito('${p.id}')" id="btn-detalle-agregar" class="flex-1 bg-[#0056b3] text-white py-3.5 rounded-2xl font-black hover:bg-blue-700 transition-colors text-sm sm:text-base shadow-lg italic uppercase flex items-center justify-center gap-2">
+        ? `<div class="flex justify-center"><button onclick="agregarCarrito('${p.id}')" id="btn-detalle-agregar" class="bg-[#0056b3] text-white py-2.5 px-6 rounded-2xl font-black hover:bg-blue-700 transition-colors text-xs sm:text-sm shadow-md italic uppercase flex items-center justify-center gap-2">
             <i class="fa-solid fa-cart-plus"></i>Agregar al carrito
            </button></div>`
-        : `<div class="flex gap-2">${btnCerrarInline}<button onclick="cerrarModal('modal-detalles'); enviarConsultaWhatsApp('${p.id}')" class="flex-1 bg-green-500 text-white py-3.5 rounded-2xl font-black hover:bg-green-600 transition-colors text-sm sm:text-base shadow-lg italic uppercase flex items-center justify-center gap-2">
+        : `<div class="flex justify-center"><button onclick="cerrarModal('modal-detalles'); enviarConsultaWhatsApp('${p.id}')" class="bg-green-500 text-white py-2.5 px-6 rounded-2xl font-black hover:bg-green-600 transition-colors text-xs sm:text-sm shadow-md italic uppercase flex items-center justify-center gap-2">
             <i class="fa-brands fa-whatsapp"></i>Consultar
            </button></div>`;
 
     document.getElementById("detalle-contenido").innerHTML = `
+        <!-- Botón cerrar desktop -->
+        <button onclick="cerrarModal('modal-detalles')"
+            class="hidden sm:flex absolute top-3 right-3 z-20 w-9 h-9 items-center justify-center bg-gray-900 text-white hover:bg-red-600 rounded-full transition-colors shadow-lg text-base font-black leading-none">
+            &times;
+        </button>
         <div class="detalle-col-galeria">
+            <!-- Pill de arrastre + botón cerrar (solo mobile) -->
+            <div class="flex items-center justify-between px-3 pt-2.5 pb-1 sm:hidden bg-white flex-shrink-0">
+                <div class="w-8"></div>
+                <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto"></div>
+                <button onclick="cerrarModal('modal-detalles')" class="w-9 h-9 flex items-center justify-center bg-gray-900 text-white hover:bg-red-600 rounded-full transition-colors shadow text-base font-black leading-none">&times;</button>
+            </div>
             <div class="detalle-img-wrap" onclick="abrirLightboxActual()">
                 <img id="main-img"
                     src="${p.imagenes[0]}"
@@ -1064,8 +1081,9 @@ function actualizarContador() {
     if (counterElement) counterElement.innerText = count;
 }
 
-function getProductoURL(id) {
-    return `${window.location.origin}${window.location.pathname}?producto=${id}`;
+function getProductoURL(id, variante = null) {
+    const base = `${window.location.origin}${window.location.pathname}?producto=${id}`;
+    return variante ? `${base}&variante=${encodeURIComponent(variante)}` : base;
 }
 
 window.consultarProductoWhatsApp = function(id) {
@@ -1118,7 +1136,7 @@ window.enviarWhatsApp = function() {
     let total = 0;
     carrito.forEach(p => {
         const etiqueta = p.variante ? `${p.nombre} (${p.variante})` : p.nombre;
-        const link = getProductoURL(p.id);
+        const link = getProductoURL(p.id, p.variante || null);
         msj += `*- ${etiqueta}* (x${p.cantidad}) - $${(p.precio * p.cantidad).toLocaleString('es-AR')}%0A   Producto: ${link}%0A`;
         total += p.precio * p.cantidad;
     });
