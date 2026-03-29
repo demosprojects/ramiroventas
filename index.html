@@ -22,13 +22,19 @@
 
         /* ── Modal detalle ── */
 
-        /* Contenedor principal: en mobile es columna, en desktop fila */
+        /*
+         * MOBILE: el modal es una sheet que sube desde abajo.
+         * La estructura es columna: [imagen fija arriba] + [info scrolleable] + [botón pegado al fondo].
+         * DESKTOP: fila: [galería 45%] + [info scroll + botón].
+         */
+
+        /* Contenedor principal */
         #detalle-contenido {
             display: flex;
             flex-direction: column;
-            overflow: hidden;  /* el scroll lo maneja cada hijo */
             flex: 1;
             min-height: 0;
+            overflow: hidden;
         }
         @media (min-width: 640px) {
             #detalle-contenido { flex-direction: row; }
@@ -41,11 +47,10 @@
             flex-direction: column;
             background: #f8fafc;
         }
-        /* En mobile: ocupa ancho completo, imagen cuadrada */
         @media (max-width: 639px) {
+            /* En mobile: altura fija para que la info quede visible debajo */
             .detalle-col-galeria { width: 100%; }
         }
-        /* En desktop: ocupa 45% del ancho, altura completa */
         @media (min-width: 640px) {
             .detalle-col-galeria { width: 45%; }
         }
@@ -54,31 +59,34 @@
         .detalle-img-wrap {
             position: relative;
             width: 100%;
-            aspect-ratio: 1 / 1;   /* cuadrada siempre en mobile */
             overflow: hidden;
             background: #f1f5f9;
             flex-shrink: 0;
             cursor: zoom-in;
         }
+        @media (max-width: 639px) {
+            /* Mobile: imagen más compacta, no cuadrada completa, deja espacio para la info */
+            .detalle-img-wrap {
+                aspect-ratio: 4 / 3;
+                max-height: 52vw;
+            }
+        }
         @media (min-width: 640px) {
             .detalle-img-wrap {
                 aspect-ratio: unset;
-                flex: 1;            /* en desktop ocupa el espacio disponible */
+                flex: 1;
                 min-height: 0;
             }
         }
 
-        /* Columna info: scroll interno, botón siempre al fondo */
+        /* Columna info: scroll interno en mobile y desktop */
         .detalle-col-info {
             flex: 1;
             min-height: 0;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+            overflow: hidden;
         }
-        .detalle-col-info::-webkit-scrollbar { display: none; }
 
         .detalle-info-body {
             flex: 1;
@@ -763,9 +771,9 @@
     </div>
 </footer>
     <div id="modal-detalles" class="fixed inset-0 bg-black/80 hidden z-[110] flex items-end sm:items-center justify-center sm:p-4 backdrop-blur-sm">
-        <div class="modal-card bg-white w-full sm:max-w-4xl rounded-t-3xl sm:rounded-3xl shadow-2xl relative max-h-[92vh] sm:max-h-[90vh] flex flex-col" style="overflow:hidden">
+        <div class="modal-card bg-white w-full sm:max-w-4xl rounded-t-3xl sm:rounded-3xl shadow-2xl relative flex flex-col" style="overflow:hidden; max-height: 88vh;">
             <div class="rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col flex-1 min-h-0">
-                <div id="detalle-contenido"></div>
+                <div id="detalle-contenido" class="flex-1 min-h-0 flex flex-col"></div>
             </div>
         </div>
     </div>
