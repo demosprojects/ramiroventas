@@ -8,6 +8,41 @@ let categoriaActual    = "Todos";
 let subcategoriaActual = null;  // null = sin filtro de subcategoría
 let filtroEstado       = "todos"; // 'todos' | 'disponibles' | 'sin-stock' | 'ofertas'
 
+// ─── TARJETAS (planes de pago cargados en el admin) ──────────────────────────
+let tarjetasMap = {}; // { id: {banco, cuotas, recargo} }
+
+async function cargarTarjetas() {
+    try {
+        const snap = await getDocs(collection(db, "tarjetas"));
+        tarjetasMap = {};
+        snap.docs.forEach(d => { tarjetasMap[d.id] = d.data(); });
+    } catch (e) {
+        console.error("Error al cargar tarjetas:", e);
+    }
+}
+
+// Devuelve los planes de tarjeta habilitados para un producto, ya resueltos
+function planesDe(prod) {
+    if (!Array.isArray(prod.tarjetas)) return [];
+    return prod.tarjetas
+        .map(id => tarjetasMap[id] ? { id, ...tarjetasMap[id] } : null)
+        .filter(Boolean);
+}
+
+function precioConRecargo(precio, recargo) {
+    return Math.round(Number(precio) * (1 + Number(recargo) / 100));
+}
+
+// Genera una miniatura liviana SOLO para las cajitas chicas de la galería (thumbs 56x56).
+// La imagen principal y las guardadas en Firestore no se tocan.
+function urlMiniatura(url, ancho) {
+    if (!url || !url.includes('res.cloudinary.com')) return url;
+    if (url.includes('/upload/f_auto,q_auto,')) {
+        return url.replace(/\/upload\/f_auto,q_auto,w_\d+,c_limit\//, `/upload/f_auto,q_auto,w_${ancho},c_limit/`);
+    }
+    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${ancho},c_limit/`);
+}
+
 // ─── NOTIFICACIONES ──────────────────────────────────────────────────────────
 
 function showToast(msj, tipo = "success") {
@@ -68,6 +103,7 @@ function renderSkeletons() {
 async function cargarProductos() {
     renderSkeletons();
     try {
+        await cargarTarjetas();
         const querySnapshot = await getDocs(collection(db, "products"));
         productos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -148,14 +184,16 @@ function verificarStockCarrito() {
                 return { ...item, sinStock: true };
             }
 
-            // ✅ Sincronizar precio de la variante
+            // ✅ Sincronizar precio de la variante (respetando el recargo de tarjeta si eligió uno)
             const { sinStock, ...itemLimpio } = item;
-            return { ...itemLimpio, precio: varianteActual.precio };
+            const precioBaseVar = Number(varianteActual.precio);
+            return { ...itemLimpio, precio: item.medioPago ? precioConRecargo(precioBaseVar, item.medioPago.recargo) : precioBaseVar };
         }
 
-        // ✅ Sincronizar precio del producto sin variante
+        // ✅ Sincronizar precio del producto sin variante (respetando el recargo de tarjeta si eligió uno)
         const { sinStock, ...itemLimpio } = item;
-        return { ...itemLimpio, precio: productoActual.precio };
+        const precioBaseProd = Number(productoActual.precio);
+        return { ...itemLimpio, precio: item.medioPago ? precioConRecargo(precioBaseProd, item.medioPago.recargo) : precioBaseProd };
     });
 
     guardarCarrito();
@@ -211,6 +249,14 @@ function renderProductos() {
             precioHTML = `<p class="card-price text-base sm:text-xl font-black text-[#0056b3] mb-2 sm:mb-3">$${Number(p.precio).toLocaleString('es-AR')}</p>`;
         }
 
+        // Badge de cuotas disponibles
+        const planes = planesDe(p);
+        const badgeCuotas = planes.length
+            ? `<p class="flex items-center gap-1 text-[9px] sm:text-[10px] font-black text-slate-400 mb-2 sm:mb-3 -mt-1">
+                   <i class="fa-solid fa-credit-card text-slate-300"></i> Cuotas con tarjeta disponibles
+               </p>`
+            : '';
+
         // Botón ver producto
         const btnAgregar = disponible
             ? `<button onclick="verDetalles('${p.id}')" class="card-btn w-full bg-gray-900 text-white py-2 sm:py-2.5 rounded-xl font-black hover:bg-[#0056b3] transition-colors flex items-center justify-center gap-1.5 italic uppercase text-[0.62rem] sm:text-xs">
@@ -230,6 +276,7 @@ function renderProductos() {
                 <div class="card-body p-3 sm:p-5">
                     <h3 class="card-name font-black text-[0.7rem] sm:text-sm md:text-base mb-1 uppercase truncate leading-tight">${p.nombre}</h3>
                     ${precioHTML}
+                    ${badgeCuotas}
                     ${btnAgregar}
                 </div>
             </div>
@@ -525,6 +572,9 @@ window.verDetalles = function(id) {
     const p = productos.find(x => x.id === id);
     if (!p) return;
 
+    // Reiniciar medio de pago seleccionado cada vez que se abre un producto
+    medioPagoSeleccionado = null;
+
     const disponible = p.disponible !== false;
     const enOferta = p.enOferta === true;
     const precioAnterior = p.precioAnterior ? Number(p.precioAnterior) : null;
@@ -552,6 +602,31 @@ window.verDetalles = function(id) {
     }
 
     const precioDetalleHTML = buildPrecioHTML(Number(p.precio), precioAnterior);
+
+    // ── Selector de medio de pago (tarjeta / efectivo) ──
+    const planes = planesDe(p);
+    let medioPagoHTML = '';
+    if (planes.length) {
+        medioPagoHTML = `
+            <div class="mb-3 sm:mb-4">
+                <p class="text-[10px] font-black uppercase text-gray-500 mb-2 tracking-wider">Medio de pago:</p>
+                <div class="flex flex-wrap gap-2" id="medios-pago-btns">
+                    <button type="button" data-plan-id="" onclick="seleccionarMedioPago(this, '${id}')"
+                        class="medio-pago-btn active border-2 border-[#0056b3] bg-blue-50 text-[#0056b3] rounded-xl px-3 py-1.5 font-black text-[10px] uppercase italic transition-all">
+                        <i class="fa-solid fa-money-bill-wave mr-1"></i>Efectivo / Transf.
+                    </button>
+                    ${planes.map(pl => `
+                        <button type="button" data-plan-id="${pl.id}" data-recargo="${pl.recargo}"
+                            onclick="seleccionarMedioPago(this, '${id}')"
+                            class="medio-pago-btn border-2 border-slate-200 text-slate-600 hover:border-[#0056b3] hover:text-[#0056b3] rounded-xl px-3 py-1.5 font-black text-[10px] uppercase italic transition-all">
+                            <i class="fa-solid fa-credit-card mr-1"></i>${pl.banco} · ${pl.cuotas} cuotas
+                        </button>
+                    `).join('')}
+                </div>
+                <p id="medio-pago-nota" class="text-[10px] text-slate-400 font-bold mt-1.5"></p>
+            </div>
+        `;
+    }
 
     // ── Selector de variantes ──
     let variantesHTML = '';
@@ -640,7 +715,7 @@ window.verDetalles = function(id) {
                     <button type="button"
                         onclick="cambiarImagenDetalle('${img}', this); event.stopPropagation()"
                         class="thumb-btn flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 ${idx === 0 ? 'border-[#0056b3]' : 'border-transparent'} hover:border-[#0056b3] transition-all">
-                        <img src="${img}" class="w-full h-full object-cover" alt="">
+                        <img src="${urlMiniatura(img, 100)}" class="w-full h-full object-cover" alt="">
                     </button>
                 `).join('')}
             </div>` : ''}
@@ -657,6 +732,7 @@ window.verDetalles = function(id) {
                 <h2 class="text-lg sm:text-2xl font-black uppercase italic mb-2 leading-tight text-gray-900">${p.nombre}</h2>
                 ${sinStockBanner}
                 ${precioDetalleHTML}
+                ${medioPagoHTML}
                 <a onclick="consultarProductoWhatsApp('${p.id}')"
                     href="#"
                     onclick="return false;"
@@ -759,6 +835,47 @@ document.addEventListener('keydown', function(e) {
 // Estado de la variante seleccionada en el modal de detalle
 let varianteSeleccionada = null; // { nombre, precio }
 
+// Estado del medio de pago seleccionado en el modal de detalle
+let medioPagoSeleccionado = null; // { id, banco, cuotas, recargo } | null (efectivo/transferencia)
+
+// Recalcula y pinta el precio mostrado según el medio de pago activo
+function actualizarPrecioConMedioPago(basePrecio) {
+    const val = document.getElementById('precio-detalle-val');
+    const nota = document.getElementById('medio-pago-nota');
+    if (!val) return;
+    if (medioPagoSeleccionado) {
+        const final = precioConRecargo(basePrecio, medioPagoSeleccionado.recargo);
+        val.textContent = `$${final.toLocaleString('es-AR')}`;
+        if (nota) nota.textContent = `Con ${medioPagoSeleccionado.banco} en ${medioPagoSeleccionado.cuotas} cuotas (+${medioPagoSeleccionado.recargo}% de recargo)`;
+    } else {
+        val.textContent = `$${basePrecio.toLocaleString('es-AR')}`;
+        if (nota) nota.textContent = '';
+    }
+}
+
+window.seleccionarMedioPago = function(btn, productId) {
+    document.querySelectorAll('#medios-pago-btns .medio-pago-btn').forEach(b => {
+        b.classList.remove('active', 'border-[#0056b3]', 'bg-blue-50', 'text-[#0056b3]');
+        b.classList.add('border-slate-200', 'text-slate-600');
+    });
+    btn.classList.remove('border-slate-200', 'text-slate-600');
+    btn.classList.add('active', 'border-[#0056b3]', 'bg-blue-50', 'text-[#0056b3]');
+
+    const planId = btn.dataset.planId;
+    if (planId && tarjetasMap[planId]) {
+        const plan = tarjetasMap[planId];
+        medioPagoSeleccionado = { id: planId, banco: plan.banco, cuotas: plan.cuotas, recargo: Number(plan.recargo) };
+    } else {
+        medioPagoSeleccionado = null;
+    }
+
+    const basePrecio = (varianteSeleccionada && varianteSeleccionada.productId === productId)
+        ? varianteSeleccionada.precio
+        : Number((productos.find(p => p.id === productId) || {}).precio || 0);
+
+    actualizarPrecioConMedioPago(basePrecio);
+};
+
 window.seleccionarVariante = function(btn, productId) {
     // Desmarcar todos
     document.querySelectorAll('#variantes-btns .variante-btn').forEach(b => {
@@ -823,6 +940,9 @@ window.seleccionarVariante = function(btn, productId) {
     // Ocultar aviso
     const aviso = document.getElementById('variante-aviso');
     if (aviso) aviso.classList.add('hidden');
+
+    // Si ya había un medio de pago elegido (tarjeta), reaplicar el recargo sobre el nuevo precio
+    actualizarPrecioConMedioPago(precio);
 };
 
 
@@ -862,10 +982,11 @@ window.agregarCarrito = function(id) {
         }
     }
 
-    // Construir clave única: id + variante (si aplica)
+    // Construir clave única: id + variante + medio de pago (si aplica)
     const varianteNombre = tieneVariantes ? varianteSeleccionada.nombre : null;
-    const precioFinal    = tieneVariantes ? varianteSeleccionada.precio  : prod.precio;
-    const carritoKey     = tieneVariantes ? `${id}__${varianteNombre}` : id;
+    const precioBase      = tieneVariantes ? varianteSeleccionada.precio  : Number(prod.precio);
+    const precioFinal     = medioPagoSeleccionado ? precioConRecargo(precioBase, medioPagoSeleccionado.recargo) : precioBase;
+    const carritoKey      = `${id}${varianteNombre ? '__' + varianteNombre : ''}${medioPagoSeleccionado ? '__' + medioPagoSeleccionado.id : ''}`;
 
     // Imagen de la variante (si tiene foto propia)
     const varObj = tieneVariantes ? prod.variantes.find(v => v.nombre === varianteNombre) : null;
@@ -881,6 +1002,7 @@ window.agregarCarrito = function(id) {
             precio:         precioFinal,
             variante:       varianteNombre,
             imagenVariante: imagenVariante,
+            medioPago:      medioPagoSeleccionado ? { ...medioPagoSeleccionado } : null,
             cantidad:       1
         });
     }
@@ -1029,6 +1151,7 @@ window.abrirCarrito = function() {
                     <div class="flex-grow min-w-0">
                         <h4 class="font-black text-[0.65rem] sm:text-xs uppercase truncate leading-tight">${p.nombre}</h4>
                         ${p.variante ? `<span class="inline-block text-[9px] font-black bg-blue-100 text-[#0056b3] px-1.5 py-0.5 rounded-md uppercase italic mb-0.5">${p.variante}</span>` : ''}
+                        ${p.medioPago ? `<span class="inline-block text-[9px] font-black bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md uppercase italic mb-0.5 ml-1"><i class="fa-solid fa-credit-card mr-0.5"></i>${p.medioPago.banco} ${p.medioPago.cuotas}c</span>` : ''}
                         <p class="text-[#0056b3] font-black text-xs sm:text-sm">$${(p.precio * p.cantidad).toLocaleString('es-AR')}</p>
                         <p class="text-gray-400 text-[10px] font-semibold">$${p.precio.toLocaleString('es-AR')} c/u</p>
                     </div>
@@ -1136,8 +1259,9 @@ window.enviarWhatsApp = function() {
     let total = 0;
     carrito.forEach(p => {
         const etiqueta = p.variante ? `${p.nombre} (${p.variante})` : p.nombre;
+        const medioTxt = p.medioPago ? ` [Tarjeta ${p.medioPago.banco} · ${p.medioPago.cuotas} cuotas]` : '';
         const link = getProductoURL(p.id, p.variante || null);
-        msj += `*- ${etiqueta}* (x${p.cantidad}) - $${(p.precio * p.cantidad).toLocaleString('es-AR')}%0A   Producto: ${link}%0A`;
+        msj += `*- ${etiqueta}*${medioTxt} (x${p.cantidad}) - $${(p.precio * p.cantidad).toLocaleString('es-AR')}%0A   Producto: ${link}%0A`;
         total += p.precio * p.cantidad;
     });
     msj += `%0A*TOTAL: $${total.toLocaleString('es-AR')}*%0A%0AMuchas gracias!`;
